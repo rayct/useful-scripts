@@ -1,6 +1,7 @@
 # My Repo of Useful Scripts
 
-* clean-nvim-swaps.sh
+* clean-nvim-swaps.sh [View Folder](/clean-nvim-swaps)
+* autoclean-nvim-swaps.sh [View Folder](/autoclean-nvim-swaps)
 
 
 
