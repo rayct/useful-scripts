@@ -1,6 +1,6 @@
 ## ✅ `Backup to USB README.md`
 
-```markdown
+
 # 📦 Directory USB Backup Script
 
 A Bash script to securely back up a hidden directory (`._Learning`) to a USB drive by creating timestamped `.tar.gz` archives. Each archive includes the backup log for traceability and reproducibility.
@@ -20,15 +20,11 @@ A Bash script to securely back up a hidden directory (`._Learning`) to a USB dri
 
 ## 📂 Archive Example
 
-```
-
 learning\_backup\_01-07-2025\_18-15-22.tar.gz
 └── learning\_backup\_01-07-2025\_18-15-22/
 ├── notes.md
 ├── diagrams/
 └── backup\_log.txt
-
-````
 
 ---
 
@@ -49,7 +45,7 @@ learning\_backup\_01-07-2025\_18-15-22.tar.gz
 2. **Make the script executable:**
    ```bash
    chmod +x backup_to_usb.sh
-````
+```
 
 3. **Run the script (with sudo if needed for USB access):**
 
@@ -78,4 +74,5 @@ learning\_backup\_01-07-2025\_18-15-22.tar.gz
 ## 📄 License
 
 MIT — free for personal or commercial use
+
 
