@@ -12,8 +12,8 @@
 
 HIDDEN_DIR="/home/ray/YOUR_DIR-HERE"           # Change to your Directory to back up
 USB_LABEL="64GB-DRIVE"                         # Label of the USB drive
-BACKUP_DIR_NAME="Learning_Backups"             # Subfolder on the USB
-LOGFILE="$HOME/backup_logs.txt"                # Global log file location
+BACKUP_DIR_NAME="USB_Backups"                  # Subfolder on the USB
+LOGFILE="$HOME/usb_backup_logs.txt"            # Global log file location
 
 # --- TIMESTAMP & FILE NAMES ---
 
@@ -46,7 +46,7 @@ cp -a "$HIDDEN_DIR/" "$TEMP_DIR/" 2>>"$LOGFILE"
 
 # --- INCLUDE LOG FILE IN BACKUP ---
 
-cp "$LOGFILE" "$TEMP_DIR/backup_log.txt" 2>>"$LOGFILE"
+cp "$LOGFILE" "$TEMP_DIR/backup_to_usb_log.txt" 2>>"$LOGFILE"
 
 # --- CREATE ARCHIVE ---
 
