@@ -1,7 +1,3 @@
-Absolutely! Here's a **detailed, step-by-step guide with a checklist** to help you confidently set up **SSH on an HP ProCurve 2810-48G switch** — perfect for study, lab setup, or production.
-
----
-
 ## ✅ **SSH Configuration Guide for HP ProCurve 2810-48G**
 
 ---
