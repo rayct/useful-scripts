@@ -3,6 +3,7 @@
 * clean-nvim-swaps.sh [View Folder](/clean-nvim-swaps)
 * autoclean-nvim-swaps.sh [View Folder](/autoclean-nvim-swaps)
 * backup-to-usb.sh [View Folder](/backup-to-usb)
+* Automate VLANS setup for a **HP ProCurve 2810-48G Network Switch** [View Folder] ()
 
 
 
@@ -10,4 +11,4 @@
 
 **Documentation by:** Raymond C. TURNER
 
-**Date:** July 1st, 2025
+**Date:** July 2nd, 2025
