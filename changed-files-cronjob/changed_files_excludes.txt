@@ -1,0 +1,11 @@
+# Filesystem paths to exclude from change tracking
+# One path per line
+/proc
+/sys
+/dev
+/run
+/tmp
+/var/tmp
+/var/log
+/swapfile
+
