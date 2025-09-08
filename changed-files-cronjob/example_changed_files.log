@@ -1,3 +1,8 @@
+
+Example output of a script that lists changed files since the last run
+
+
+
 ========== Sat Sep  6 02:00:01 UTC 2025 ==========
 Changed files since last run: 47
 --- Top 10 biggest changed files ---
@@ -9,4 +14,3 @@ Changed files since last run: 47
 /etc/group
 /home/r/.bashrc
 ...
-
