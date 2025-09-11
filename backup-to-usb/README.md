@@ -1,34 +1,36 @@
-## ✅ `Backup to USB README.md`
+## `Backup to USB README.md`
 
 
-# 📦 Directory USB Backup Script
+# Directory USB Backup Script
 
 A Bash script to securely back up a hidden directory (`._Learning`) to a USB drive by creating timestamped `.tar.gz` archives. Each archive includes the backup log for traceability and reproducibility.
 
 ---
 
-## 🔧 Features
+## Features
 
-- 🗂️ Backs up `/home/ray/YOUR_DIR_HERE`
-- 💾 Saves to a mounted USB by label (e.g., `64GB-DRIVE`)
-- 📦 Compresses everything into a single `.tar.gz` archive
-- 🧠 Includes a copy of the log file in every backup
-- ⏱️  Appends a UK-format timestamp to each archive to prevent overwriting
-- 🧹 Cleans up temp files after completion
+- Backs up `/home/ray/YOUR_DIR_HERE`
+- Saves to a mounted USB by label (e.g., `64GB-DRIVE`)
+- Compresses everything into a single `.tar.gz` archive
+- Includes a copy of the log file in every backup
+- Appends a UK-format timestamp to each archive to prevent overwriting
+- Cleans up temp files after completion
 
 ---
 
-## 📂 Archive Example
+## Archive Example
 
 learning\_backup\_01-07-2025\_18-15-22.tar.gz
+
 └── learning\_backup\_01-07-2025\_18-15-22/
+
 ├── notes.md
 ├── diagrams/
 └── backup\_log.txt
 
 ---
 
-## 🛠️ Requirements
+## Requirements
 
 - Linux system
 - Mounted USB drive with a known volume label (default: `64GB-DRIVE`)
@@ -36,7 +38,7 @@ learning\_backup\_01-07-2025\_18-15-22.tar.gz
 
 ---
 
-## 🚀 Usage
+## Usage
 
 1. **Edit the script** to match your setup:
    - Update the `HIDDEN_DIR` path
@@ -55,7 +57,7 @@ learning\_backup\_01-07-2025\_18-15-22.tar.gz
 
 ---
 
-## 📒 Notes
+## Notes
 
 * You can schedule this with `cron` for automatic backups
 * Archives are safe to store on exFAT/FAT32 formatted USB drives
@@ -63,7 +65,7 @@ learning\_backup\_01-07-2025\_18-15-22.tar.gz
 
 ---
 
-## 🔐 Optional Add-ons
+## Optional Add-ons
 
 * Encrypt the archive using `gpg` or `openssl`
 * Sync backups to cloud (rclone, rsync, etc.)
@@ -71,7 +73,7 @@ learning\_backup\_01-07-2025\_18-15-22.tar.gz
 
 ---
 
-## 📄 License
+## License
 
 MIT — free for personal or commercial use
 
