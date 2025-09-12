@@ -77,4 +77,9 @@ learning\_backup\_01-07-2025\_18-15-22.tar.gz
 
 MIT — free for personal or commercial use
 
+---
+
+**Documentation By:** Raymond C. Turner
+**Date** September 12th, 2025
+
 
