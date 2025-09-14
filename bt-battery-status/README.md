@@ -1,4 +1,5 @@
-Bluetooth Device Battery Level Tool
+An Overly Bloated CLI Bluetooth Device Battery Level Tool
+Written in BASH and Python with the option to set a systemd service + timer to automatically log battery levels every 30 minutes 
 
 ---
 
@@ -84,7 +85,7 @@ bt-battery.sh --csv
 
 ## ⏱️ Automatic Logging with systemd
 
-You can set up a **systemd service + timer** to automatically log battery levels every 30 minutes.
+A **systemd service + timer** to automatically log battery levels every 30 minutes.
 
 ### 1. Systemd Service (JSON + CSV)
 
@@ -282,8 +283,6 @@ python3 bt-battery-plot.py
 MIT License.
 Feel free to modify and share.
 
-```
-
 ---
 
 This README now reflects:
@@ -295,5 +294,6 @@ This README now reflects:
 
 ---
 
-If you want, I can also provide a **ready-to-use example directory structure** with the scripts, logs folders, and systemd files pre-configured, so it’s plug-and-play. Do you want me to do that?
-```
+Documentation By: Raymond C. Turner
+Date: September 14th, 2025
+
