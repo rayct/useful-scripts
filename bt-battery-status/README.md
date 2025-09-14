@@ -1,95 +1,85 @@
-An Overly Bloated CLI Bluetooth Device Battery Level Tool
-Written in BASH and Python with the option to set a systemd service + timer to automatically log battery levels every 30 minutes. 
-
----
-
-````markdown
 # Bluetooth Battery Status Script
 
-A simple Bash script to check the **battery level of Bluetooth devices** (keyboards, mice, trackpads, headphones, etc.) on Linux using `bluetoothctl`.  
-
-It supports:
-- Listing **connected devices** (default)  
-- Listing **all paired devices** (`--all`)  
-- Showing/hiding devices that don’t report battery info (`--verbose`)  
-- Output as:
-  - **Pretty table** (default)  
-  - **JSON** (`--json`) – structured, good for automation  
-  - **CSV** (`--csv`) – spreadsheet friendly (Excel/LibreOffice)  
-- Automatic logging with **systemd timers**  
-- Visualization with **Python + matplotlib** (supports both JSON and CSV logs)  
-- Logs are now stored in **script-relative directories** for portability  
+A simple Bash script to monitor and log **Bluetooth device battery levels** on Linux.
 
 ---
 
-## 🔧 Requirements
+## 🔹 Features
 
-- Linux system with [BlueZ](http://www.bluez.org/) installed  
-- `bluetoothctl` (comes with BlueZ)  
-- `jq` (for parsing JSON logs, optional)  
-- `systemd` (for scheduled logging, optional)  
-- `python3` + `matplotlib` (for plotting history, optional)  
+* Logs **connected Bluetooth devices** battery levels.
+* JSON and CSV logs are **always generated**, no flags needed.
+* Optional flags:
+
+  * `--all` → include all paired devices
+  * `--verbose` → include devices with no battery info
+* Pretty table output to console.
+* Compatible with Python plotting script for historical analysis.
+* Logs use **UK/GB local time** (`DD-MM-YYYY, HH:MM:SS±TZ`).
 
 ---
 
-## 📦 Installation
+## 🔹 Log Locations
 
-Clone or copy the script to your system and make it executable:
+* **JSON (NDJSON)**: `logs/json/bt-battery-log.json`
+
+  * Each line is a complete JSON object representing a single logging event.
+  * Example entry:
+
+```json
+{"timestamp":"14-09-2025, 10:14:24+01:00","devices":[{"name":"MX Keys Mac","mac":"FE:12:51:4D:4C:32","battery":"50%"}]}
+```
+
+* **CSV**: `logs/csv/bt-battery-log.csv`
+
+  * Timestamp and device info separated by commas.
+  * Example entry:
+
+```
+14-09-2025, 10:14:24+01:00,MX Keys Mac,FE:12:51:4D:4C:32,50%
+```
+
+> **Note:** The JSON log is **newline-delimited (NDJSON)**, not a single JSON array. This allows **safe appending** of entries without rewriting the file. Most tools, including the provided Python plotting script, parse it line by line without issues.
+
+---
+
+## 🔹 Usage
 
 ```bash
-chmod +x bt-battery.sh
-````
+# Default run (logs JSON + CSV)
+./bt-battery.sh
 
-Optionally move it into your `$PATH`:
+# Include all paired devices
+./bt-battery.sh --all
 
-```bash
-sudo mv bt-battery.sh /usr/local/bin/bt-battery
+# Include devices with no battery info
+./bt-battery.sh --verbose
 ```
 
 ---
 
-## 🚀 Usage
+## 🔹 Automatic Logging with systemd
 
-### Table view (default)
+The project includes an **installation script** that sets up the systemd service and timer automatically.
 
-```bash
-bt-battery.sh
-```
+### Installation Script
 
-### JSON output
+`install-bt-battery-systemd.sh`:
 
 ```bash
-bt-battery.sh --json
+chmod +x install-bt-battery-systemd.sh
+./install-bt-battery-systemd.sh
 ```
 
-### CSV output
+This script will:
 
-```bash
-bt-battery.sh --csv
-```
+1. Copy `bt-battery.service` and `bt-battery.timer` to `~/.config/systemd/user/`.
+2. Reload the user systemd daemon.
+3. Enable and start the timer automatically.
+4. Run the logger every 30 minutes and 5 minutes after boot.
 
-> ✅ Logs are written to the following subdirectories relative to the script:
->
-> * JSON logs: `logs/json/bt-battery-log.json`
-> * CSV logs: `logs/csv/bt-battery-log.csv`
+### Manual systemd Setup (Optional)
 
----
-
-## ⚠️ Notes
-
-* Not all devices report battery percentage!
-* `bluetoothctl info` only reports battery for **connected devices**.
-* Logs now include a **timestamp** for each entry.
-
----
-
-## ⏱️ Automatic Logging with systemd
-
-A **systemd service + timer** to automatically log battery levels every 30 minutes.
-
-### 1. Systemd Service (JSON + CSV)
-
-`~/.config/systemd/user/bt-battery.service`:
+**Service file:** `systemd/bt-battery.service`
 
 ```ini
 [Unit]
@@ -97,16 +87,10 @@ Description=Log Bluetooth battery levels (JSON + CSV)
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash /path/to/bt-battery.sh --json --csv
+ExecStart=/bin/bash /path/to/bt-battery.sh
 ```
 
-* The Bash script automatically creates `logs/json` and `logs/csv` directories relative to the script.
-* JSON logs go to `logs/json/bt-battery-log.json`.
-* CSV logs go to `logs/csv/bt-battery-log.csv`.
-
-### 2. Timer
-
-`~/.config/systemd/user/bt-battery.timer`:
+**Timer file:** `systemd/bt-battery.timer`
 
 ```ini
 [Unit]
@@ -121,7 +105,7 @@ Unit=bt-battery.service
 WantedBy=timers.target
 ```
 
-Enable and start the timer:
+Enable and start manually:
 
 ```bash
 systemctl --user daemon-reload
@@ -131,166 +115,61 @@ systemctl --user start bt-battery.timer
 
 ---
 
-## 📝 Log Formats
+## 🔹 Python Plotting Script
 
-### JSON
+The project includes `bt-battery-plot.py`, which **merges JSON and CSV logs** and plots historical battery levels for all devices.
 
-```json
-{
-  "timestamp": "2025-08-29T14:30:00Z",
-  "devices": [
-    {"name": "MX Keys", "mac": "FE:12:51:4D:4C:32", "battery": "50%"},
-    {"name": "Magic Trackpad", "mac": "AA:BB:CC:DD:EE:FF", "battery": "62%"}
-  ]
-}
-```
+### Features
 
-### CSV
+* Reads **NDJSON (`logs/json/bt-battery-log.json`)** and **CSV (`logs/csv/bt-battery-log.csv`)** logs.
+* Merges all entries into a single dataset.
+* Groups data by device and plots battery percentage over time.
+* UK/GB timestamps from the logs are used on the X-axis.
+* Ignores malformed or incomplete log entries.
+* Generates a clean line plot with markers for each device.
 
-```
-2025-08-29T14:30:00Z,MX Keys,FE:12:51:4D:4C:32,50%
-2025-08-29T14:30:00Z,Magic Trackpad,AA:BB:CC:DD:EE:FF,62%
-```
-
-Columns: `timestamp,device name,MAC,battery`
-
----
-
-## 📊 Working with Logs (JSON + jq)
-
-### Pretty-print the latest JSON entry
-
-```bash
-tail -n 1 logs/json/bt-battery-log.json | jq
-```
-
-### Show battery levels grouped by timestamp
-
-```bash
-jq -r '.timestamp + " → " + ([.devices[] | "\(.name): \(.battery)"] | join(", "))' logs/json/bt-battery-log.json
-```
-
-### Extract history for one device
-
-```bash
-jq -r '. as $root | .devices[] | select(.name=="MX Keys") | "\($root.timestamp) \(.battery)"' logs/json/bt-battery-log.json
-```
-
----
-
-## 📈 Python Helper Script (JSON + CSV)
-
-Plot battery history from either JSON or CSV logs.
-
-Save as `bt-battery-plot.py`:
-
-```python
-#!/usr/bin/env python3
-import json
-import csv
-import matplotlib.pyplot as plt
-from datetime import datetime
-from pathlib import Path
-
-SCRIPT_DIR = Path(__file__).parent
-
-LOG_JSON = SCRIPT_DIR / "logs/json/bt-battery-log.json"
-LOG_CSV = SCRIPT_DIR / "logs/csv/bt-battery-log.csv"
-
-if LOG_JSON.exists():
-    log_file = LOG_JSON
-    mode = "json"
-elif LOG_CSV.exists():
-    log_file = LOG_CSV
-    mode = "csv"
-else:
-    raise FileNotFoundError("No log file found in 'logs/json' or 'logs/csv' directories.")
-
-entries = []
-
-if mode == "json":
-    with open(log_file, "r") as f:
-        for line in f:
-            try:
-                data = json.loads(line)
-                ts = datetime.fromisoformat(data["timestamp"].replace("Z", "+00:00"))
-                for dev in data["devices"]:
-                    name = dev.get("name", "Unknown")
-                    battery = dev.get("battery", "0%").rstrip("%")
-                    try:
-                        battery = int(battery)
-                    except ValueError:
-                        continue
-                    entries.append((name, ts, battery))
-            except json.JSONDecodeError:
-                continue
-
-elif mode == "csv":
-    with open(log_file, "r") as f:
-        reader = csv.reader(f)
-        for row in reader:
-            if len(row) != 4:
-                continue
-            ts, name, mac, battery = row
-            try:
-                ts = datetime.fromisoformat(ts.replace("Z", "+00:00"))
-                battery = int(battery.rstrip("%"))
-            except Exception:
-                continue
-            entries.append((name, ts, battery))
-
-# Group by device
-devices = {}
-for name, ts, battery in entries:
-    devices.setdefault(name, []).append((ts, battery))
-
-# Plot
-plt.figure(figsize=(10, 6))
-for name, values in devices.items():
-    values.sort(key=lambda x: x[0])
-    times, bats = zip(*values)
-    plt.plot(times, bats, marker="o", label=name)
-
-plt.xlabel("Time")
-plt.ylabel("Battery %")
-plt.title(f"Bluetooth Device Battery Levels Over Time ({mode.upper()} log)")
-plt.legend()
-plt.grid(True)
-plt.tight_layout()
-plt.show()
-```
-
-Run it:
+### Usage
 
 ```bash
 python3 bt-battery-plot.py
 ```
 
-> The script automatically detects whether JSON or CSV logs exist and plots the battery history.
+---
+
+## 🔹 Importing CSV into Excel / LibreOffice
+
+* Open `logs/csv/bt-battery-log.csv`.
+* Use comma (,) as separator.
+* View timestamped battery history.
 
 ---
 
-## 📦 Importing CSV into Excel / LibreOffice
+## 🔹 Notes
 
-1. Open `logs/csv/bt-battery-log.csv`.
-2. Choose **comma (,) as separator**.
-3. You’ll see a table of timestamped battery history.
+* Not all devices report battery levels.
+* JSON and CSV logs are **timestamped with UK/GB time**.
+* NDJSON format allows safe appending and fast logging.
+* The Python plotting script handles both JSON and CSV logs simultaneously.
+* The installation script simplifies systemd setup to **one command**.
 
 ---
 
-## 📝 License
+## 🔹 License
 
 MIT License.
-Feel free to modify and share.
 
 ---
 
-This README now reflects:
+This README now fully covers:
 
-- Script-relative logging directories (`logs/json` and `logs/csv`)  
-- Dual logging to JSON + CSV  
-- Python plotting works automatically with either format  
-- Systemd service calls the Bash script once and logs to both directories  
+* NDJSON vs CSV logging
+* UK/GB timestamps
+* Python plotting functionality
+* Automatic systemd installation
+* Usage instructions and examples
+
+Everything is documented to match all current scripts and project structure.
+
 
 ---
 

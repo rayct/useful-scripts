@@ -1,6 +1,6 @@
 #!/bin/bash
 # bt-battery.sh
-# Logs Bluetooth device battery levels in JSON and CSV
+# Logs Bluetooth device battery levels in JSON and CSV with UK/GB timestamp
 
 # Get directory of this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -19,7 +19,6 @@ LOG_FILE_CSV="$LOG_DIR_CSV/bt-battery-log.csv"
 # Argument parsing
 mode="Connected"
 verbose=false
-
 for arg in "$@"; do
     case $arg in
         --all) mode="Paired" ;;
@@ -52,9 +51,12 @@ for dev in $(bluetoothctl devices $mode | awk '{print $2}'); do
     devices+=("$name,$dev,$battery")
 done
 
-timestamp=$(date -u +"%d-%m-%YT%H:%M:%SZ")
+# UK/GB local timestamp
+date_part=$(TZ="Europe/London" date +"%d-%m-%Y")
+time_part=$(TZ="Europe/London" date +"%H:%M:%S%:z")
+timestamp="$date_part, $time_part"
 
-# Output JSON log (always)
+# JSON log (fixed)
 if [[ ${#devices[@]} -gt 0 ]]; then
     {
         echo -n "{\"timestamp\":\"$timestamp\",\"devices\":["
@@ -70,12 +72,12 @@ if [[ ${#devices[@]} -gt 0 ]]; then
     } | tee -a "$LOG_FILE_JSON"
 fi
 
-# Output CSV log (always)
+# CSV log (always)
 for dev in "${devices[@]}"; do
     echo "$timestamp,$dev" | tee -a "$LOG_FILE_CSV"
 done
 
-# Default pretty table for console
+# Pretty table
 printf "%-25s %-20s %-10s\n" "Device Name" "MAC Address" "Battery"
 printf "%-25s %-20s %-10s\n" "-----------" "-----------" "-------"
 for dev in "${devices[@]}"; do
