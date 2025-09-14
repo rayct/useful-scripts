@@ -1,5 +1,5 @@
 An Overly Bloated CLI Bluetooth Device Battery Level Tool
-Written in BASH and Python with the option to set a systemd service + timer to automatically log battery levels every 30 minutes 
+Written in BASH and Python with the option to set a systemd service + timer to automatically log battery levels every 30 minutes. 
 
 ---
 
@@ -295,5 +295,6 @@ This README now reflects:
 ---
 
 Documentation By: Raymond C. Turner
+
 Date: September 14th, 2025
 
