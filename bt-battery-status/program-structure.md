@@ -67,7 +67,7 @@ for dev in $(bluetoothctl devices $mode | awk '{print $2}'); do
     devices+=("$name,$dev,$battery")
 done
 
-timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+timestamp=$(date -u +"%d-%m-%YT%H:%M:%SZ")
 
 # JSON log
 if [[ ${#devices[@]} -gt 0 ]]; then
@@ -239,3 +239,8 @@ zip -r bt-battery.zip bt-battery/
 ```
 
 ✅ Result: `bt-battery.zip` contains the **complete, plug-and-play project** with logs, scripts, systemd files, README.md, and .gitignore.
+
+---
+
+Documentation By: Raymond C. Turner
+Date: September 14th, 2025
