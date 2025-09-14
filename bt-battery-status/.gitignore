@@ -1,0 +1,14 @@
+# Ignore logs
+logs/json/
+logs/csv/
+
+# Python cache
+*.pyc
+__pycache__/
+
+# Editor/system files
+.DS_Store
+*.swp
+
+# Temp logs
+*.log

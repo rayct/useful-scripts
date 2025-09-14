@@ -52,7 +52,7 @@ for dev in $(bluetoothctl devices $mode | awk '{print $2}'); do
     devices+=("$name,$dev,$battery")
 done
 
-timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+timestamp=$(date -u +"%d-%m-%YT%H:%M:%SZ")
 
 # Output JSON log (always)
 if [[ ${#devices[@]} -gt 0 ]]; then
