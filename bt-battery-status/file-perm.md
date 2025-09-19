@@ -1,9 +1,3 @@
-Great question 👍
-
-When you want a script or binary to be **executable by anyone (globally)** on a Linux system, there are two parts to consider:
-
----
-
 ### 1. **File Permissions**
 
 The script itself must be executable for **all users**:
