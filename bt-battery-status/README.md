@@ -57,13 +57,52 @@ A simple Bash script to monitor and log **Bluetooth device battery levels** on L
 
 ---
 
+## 🔹 Global Installation
+
+You can install the script globally so it’s accessible system-wide as `bt-battery`.
+
+### Option 1: Using Makefile
+
+```bash
+make install
+```
+
+This will:
+
+* Copy `bt-battery.sh` → `/usr/local/bin/bt-battery`
+* Set correct permissions (`755`)
+* Set ownership (`root:root`)
+
+Uninstall with:
+
+```bash
+make uninstall
+```
+
+### Option 2: Using Installer Script
+
+```bash
+chmod +x install-bt-battery-global.sh
+./install-bt-battery-global.sh
+```
+
+This script installs `bt-battery.sh` into `/usr/local/bin/` with the correct permissions.
+
+After installation, simply run:
+
+```bash
+bt-battery
+```
+
+from anywhere.
+
+---
+
 ## 🔹 Automatic Logging with systemd
 
 The project includes an **installation script** that sets up the systemd service and timer automatically.
 
 ### Installation Script
-
-`install-bt-battery-systemd.sh`:
 
 ```bash
 chmod +x install-bt-battery-systemd.sh
@@ -76,42 +115,6 @@ This script will:
 2. Reload the user systemd daemon.
 3. Enable and start the timer automatically.
 4. Run the logger every 30 minutes and 5 minutes after boot.
-
-### Manual systemd Setup (Optional)
-
-**Service file:** `systemd/bt-battery.service`
-
-```ini
-[Unit]
-Description=Log Bluetooth battery levels (JSON + CSV)
-
-[Service]
-Type=oneshot
-ExecStart=/bin/bash /path/to/bt-battery.sh
-```
-
-**Timer file:** `systemd/bt-battery.timer`
-
-```ini
-[Unit]
-Description=Run Bluetooth battery logger every 30 minutes
-
-[Timer]
-OnBootSec=5m
-OnUnitActiveSec=30m
-Unit=bt-battery.service
-
-[Install]
-WantedBy=timers.target
-```
-
-Enable and start manually:
-
-```bash
-systemctl --user daemon-reload
-systemctl --user enable bt-battery.timer
-systemctl --user start bt-battery.timer
-```
 
 ---
 
@@ -154,26 +157,80 @@ python3 bt-battery-plot.py
 
 ---
 
+## 🔹 Developer Notes & Contribution
+
+### Project Structure
+
+```
+bt-battery/
+├── bt-battery.sh                # Main logger script
+├── bt-battery-plot.py           # Python plotting script
+├── logs/                        # JSON + CSV logs stored here
+│   ├── json/
+│   └── csv/
+├── systemd/                     # systemd service + timer
+├── Makefile                     # Global installer
+├── install-bt-battery-global.sh # Alternate global installer
+├── install-bt-battery-systemd.sh# systemd setup helper
+├── README.md
+└── .gitignore
+```
+
+### Contributing
+
+1. Fork the repo and create a feature branch:
+
+   ```bash
+   git checkout -b feature/my-change
+   ```
+2. Make changes, update docs/tests if needed.
+3. Run linting (e.g., `shellcheck bt-battery.sh` for Bash, `flake8` for Python).
+4. Submit a pull request with a clear description.
+
+### Debugging Tips
+
+* Run `bt-battery.sh --verbose` to include all devices, even without battery info.
+* Check systemd logs with:
+
+  ```bash
+  journalctl --user -u bt-battery.service
+  ```
+* Validate NDJSON logs with:
+
+  ```bash
+  jq . logs/json/bt-battery-log.json
+  ```
+* If plotting fails, verify dependencies:
+
+  ```bash
+  pip install matplotlib
+  ```
+
+### Roadmap Ideas
+
+* Add support for exporting to SQLite or InfluxDB.
+* Create a web-based dashboard for real-time battery monitoring.
+* Add notifications (e.g., low battery alerts).
+
+---
+
 ## 🔹 License
 
 MIT License.
 
 ---
 
-This README now fully covers:
+README covers:
 
-* NDJSON vs CSV logging
-* UK/GB timestamps
-* Python plotting functionality
-* Automatic systemd installation
-* Usage instructions and examples
-
-Everything is documented to match all current scripts and project structure.
+* Installation (local + global)
+* Logging & plotting
+* systemd setup (manual + auto)
+* Developer guide (contribution, debugging, roadmap)
 
 
 ---
 
 Documentation By: Raymond C. Turner
 
-Date: September 14th, 2025
+Date: September 19th, 2025
 
