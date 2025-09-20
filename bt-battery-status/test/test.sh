@@ -1,6 +1,4 @@
 #!/bin/bash
-# bt-battery.sh
-# Logs Bluetooth device battery levels in JSON and CSV with UK/GB timestamp
 
 # Get directory of this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -16,71 +14,122 @@ mkdir -p "$LOG_DIR_JSON" "$LOG_DIR_CSV"
 LOG_FILE_JSON="$LOG_DIR_JSON/bt-battery-log.json"
 LOG_FILE_CSV="$LOG_DIR_CSV/bt-battery-log.csv"
 
-# Argument parsing
-mode="Connected"
+# Flags
+all=false
 verbose=false
-for arg in "$@"; do
-    case $arg in
-        --all) mode="Paired" ;;
+usb=false
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --all) all=true ;;
         --verbose) verbose=true ;;
+        --usb) usb=true ;;
+        *) echo "Unknown option: $1"; exit 1 ;;
     esac
+    shift
 done
 
-# Collect devices
-devices=()
-for dev in $(bluetoothctl devices $mode | awk '{print $2}'); do
-    name=$(bluetoothctl info $dev | grep "Name:" | cut -d' ' -f2-)
-    battery_raw=$(bluetoothctl info $dev | grep "Battery")
+timestamp=$(TZ="Europe/London" date +"%d-%m-%Y, %H:%M:%S%:z")
 
-    if [[ -z "$battery_raw" ]]; then
-        battery="No battery info"
-    else
-        if [[ "$battery_raw" =~ ([0-9]+)% ]]; then
-            battery="${BASH_REMATCH[1]}%"
-        elif [[ "$battery_raw" =~ \(([0-9]+)\) ]]; then
-            battery="${BASH_REMATCH[1]}%"
-        else
-            battery="$battery_raw"
+bt_devices=()
+usb_devices=()
+
+##############################################
+# Collect Bluetooth devices (hcitool + GATT) #
+##############################################
+mapfile -t paired < <(bluetoothctl paired-devices | awk '{print $2,$3,$4,$5,$6,$7,$8}')
+for line in "${paired[@]}"; do
+    mac=$(echo "$line" | awk '{print $1}')
+    name=$(echo "$line" | cut -d' ' -f2-)
+    battery=""
+
+    # Read battery info via bluetoothctl
+    info=$(timeout 5 bluetoothctl info "$mac" 2>/dev/null)
+    if echo "$info" | grep -qi "Battery"; then
+        battery=$(echo "$info" | grep "Battery" | awk '{print $2}')
+    fi
+
+    if [[ -n "$battery" || "$verbose" == true ]]; then
+        bt_devices+=("$name,$mac,$battery")
+    fi
+done
+
+##############################################
+# Collect USB devices (via sysfs)            #
+##############################################
+if [[ "$usb" == true ]]; then
+    for dev in /sys/class/power_supply/*; do
+        if [[ -f "$dev/status" && -f "$dev/capacity" ]]; then
+            id=$(basename "$dev")
+            status=$(<"$dev/status")
+            capacity=$(<"$dev/capacity")
+            usb_devices+=("$id,$status,${capacity}%")
         fi
-    fi
-
-    if [[ "$battery" == "No battery info" && $verbose == false ]]; then
-        continue
-    fi
-
-    devices+=("$name,$dev,$battery")
-done
-
-# UK/GB local timestamp
-date_part=$(TZ="Europe/London" date +"%d-%m-%Y")
-time_part=$(TZ="Europe/London" date +"%H:%M:%S%:z")
-timestamp="$date_part, $time_part"
-
-# JSON log (fixed)
-if [[ ${#devices[@]} -gt 0 ]]; then
-    {
-        echo -n "{\"timestamp\":\"$timestamp\",\"devices\":["
-        for ((i=0; i<${#devices[@]}; i++)); do
-            IFS=',' read -r name mac battery <<< "${devices[$i]}"
-            if [[ $i -lt $(( ${#devices[@]} - 1 )) ]]; then
-                echo -n "{\"name\":\"$name\",\"mac\":\"$mac\",\"battery\":\"$battery\"},"
-            else
-                echo -n "{\"name\":\"$name\",\"mac\":\"$mac\",\"battery\":\"$battery\"}"
-            fi
-        done
-        echo "]}"
-    } | tee -a "$LOG_FILE_JSON"
+    done
 fi
 
-# CSV log (always)
-for dev in "${devices[@]}"; do
-    echo "$timestamp,$dev" | tee -a "$LOG_FILE_CSV"
+##############################################
+# JSON Output (NDJSON format)                #
+##############################################
+devices_json=""
+
+# Bluetooth
+for bt in "${bt_devices[@]}"; do
+    name=$(echo "$bt" | cut -d',' -f1)
+    mac=$(echo "$bt" | cut -d',' -f2)
+    battery=$(echo "$bt" | cut -d',' -f3)
+    devices_json+="{\"name\":\"$name\",\"mac\":\"$mac\",\"battery\":\"$battery\",\"type\":\"bluetooth\"},"
 done
 
-# Pretty table
-printf "%-25s %-20s %-10s\n" "Device Name" "MAC Address" "Battery"
-printf "%-25s %-20s %-10s\n" "-----------" "-----------" "-------"
-for dev in "${devices[@]}"; do
-    IFS=',' read -r name mac battery <<< "$dev"
-    printf "%-25s %-20s %-10s\n" "$name" "$mac" "$battery"
+# USB
+for usb in "${usb_devices[@]}"; do
+    id=$(echo "$usb" | cut -d',' -f1)
+    status=$(echo "$usb" | cut -d',' -f2)
+    battery=$(echo "$usb" | cut -d',' -f3)
+    devices_json+="{\"name\":\"$id\",\"battery\":\"$battery\",\"status\":\"$status\",\"type\":\"usb\"},"
+done
+
+# Trim trailing comma
+devices_json="[${devices_json%,}]"
+
+json_output="{\"timestamp\":\"$timestamp\",\"devices\":$devices_json}"
+
+# Append to JSON log
+echo "$json_output" >> "$LOG_FILE_JSON"
+
+##############################################
+# CSV Output                                 #
+##############################################
+for bt in "${bt_devices[@]}"; do
+    name=$(echo "$bt" | cut -d',' -f1)
+    mac=$(echo "$bt" | cut -d',' -f2)
+    battery=$(echo "$bt" | cut -d',' -f3)
+    echo "$timestamp,$name,$mac,$battery,bluetooth" >> "$LOG_FILE_CSV"
+done
+
+for usb in "${usb_devices[@]}"; do
+    id=$(echo "$usb" | cut -d',' -f1)
+    status=$(echo "$usb" | cut -d',' -f2)
+    battery=$(echo "$usb" | cut -d',' -f3)
+    echo "$timestamp,$id,,$battery,$status,usb" >> "$LOG_FILE_CSV"
+done
+
+##############################################
+# Pretty Console Output                      #
+##############################################
+printf "\n%-20s %-20s %-10s %-10s\n" "Name" "MAC/ID" "Battery" "Type"
+printf "%-20s %-20s %-10s %-10s\n" "--------------------" "--------------------" "----------" "----------"
+
+for bt in "${bt_devices[@]}"; do
+    name=$(echo "$bt" | cut -d',' -f1)
+    mac=$(echo "$bt" | cut -d',' -f2)
+    battery=$(echo "$bt" | cut -d',' -f3)
+    printf "%-20s %-20s %-10s %-10s\n" "$name" "$mac" "$battery" "bluetooth"
+done
+
+for usb in "${usb_devices[@]}"; do
+    id=$(echo "$usb" | cut -d',' -f1)
+    status=$(echo "$usb" | cut -d',' -f2)
+    battery=$(echo "$usb" | cut -d',' -f3)
+    printf "%-20s %-20s %-10s %-10s\n" "$id" "$status" "$battery" "usb"
 done

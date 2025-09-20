@@ -1,8 +1,4 @@
-A **ready-to-zip project structure** fully updated with the latest scripts, logs directories, systemd files, README, and `.gitignore`. Everything is plug-and-play.
-
----
-
-## 1️⃣ Directory Structure
+## 1 Directory Structure
 
 ```
 bt-battery/
@@ -20,7 +16,7 @@ bt-battery/
 
 ---
 
-## 2️⃣ bt-battery.sh
+## 2 bt-battery.sh
 
 * Valid JSON output (NDJSON).
 * CSV logging.
@@ -32,7 +28,7 @@ bt-battery/
 
 ---
 
-## 3️⃣ bt-battery-plot.py
+## 3 bt-battery-plot.py
 
 * Reads **NDJSON and CSV**.
 * Merges logs into one dataset.
@@ -43,7 +39,7 @@ bt-battery/
 
 ---
 
-## 4️⃣ systemd/bt-battery.service
+## 4 systemd/bt-battery.service
 
 ```ini
 [Unit]
@@ -58,7 +54,7 @@ ExecStart=/bin/bash /path/to/bt-battery.sh
 
 ---
 
-## 5️⃣ systemd/bt-battery.timer
+## 5 systemd/bt-battery.timer
 
 ```ini
 [Unit]
@@ -75,14 +71,14 @@ WantedBy=timers.target
 
 ---
 
-## 6️⃣ README.md
+## 6 README.md
 
 * Fully updated to reflect **NDJSON**, **CSV**, **UK/GB timestamps**, **systemd**, and **Python plotting script**.
 * Matches the current scripts and project behavior.
 
 ---
 
-## 7️⃣ .gitignore
+## 7 .gitignore
 
 ```
 # Ignore logs
@@ -103,7 +99,7 @@ __pycache__/
 
 ---
 
-## 8️⃣ Creating the ZIP Archive
+## 8 Creating the ZIP Archive
 
 From the parent directory:
 
