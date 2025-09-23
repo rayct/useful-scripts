@@ -1,0 +1,10 @@
+# Ignore sensitive MySQL config
+.my.cnf
+
+# Ignore editor/OS junk
+*.swp
+*.swo
+*.bak
+.DS_Store
+Thumbs.db
+
