@@ -84,5 +84,5 @@ If this fails, the script cannot run queries until credentials are available.
 
 ---
 
-After updating `~/.my.cnf` or using a dedicated user, the script will successfully log both CSV and JSON outputs.
+After updating `~/.my.cnf` or using a dedicated user, the script will successfully log both CSV and JSON outputs to log folder.
 
