@@ -1,3 +1,4 @@
+
 # Clean Flatpak App Updates (Linux)
 
 This setup ensures that Flatpak applications are updated **safely** while **ignoring unnecessary locale and runtime rebuilds**, keeping logs clean and preventing daily update noise. It is especially useful for apps like Obsidian that frequently show `.Locale` updates that do not affect functionality.
@@ -130,15 +131,31 @@ Now you can run:
 update-flatpaks
 ```
 
-Logs of updates are stored at:
+---
 
-```text
+### 5. View Update Logs
+
+All clean update logs are stored at:
+
+```bash
 ~/.local/share/flatpak-clean-updates.log
 ```
 
+You can check the most recent updates with:
+
+```bash
+# Show last 20 lines
+tail -n 20 ~/.local/share/flatpak-clean-updates.log
+
+# Show all updates
+cat ~/.local/share/flatpak-clean-updates.log
+```
+
+The log will include only **real app updates**, not locale or runtime rebuilds.
+
 ---
 
-### 5. Verify Safety
+### 6. Verify Safety
 
 1. **Check Flatpak permissions:**
 
@@ -183,5 +200,6 @@ This setup is free to use and modify. No restrictions.
 
 ---
 
-*Documentation by:* Raymond C. Turner
-*Date:* October 10th, 2025
+**Documentation by:** Raymond C. Turner
+
+**Date:** October 10th, 2025
