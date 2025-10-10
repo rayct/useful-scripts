@@ -8,7 +8,7 @@
 * A cron job that scans your filesystem for files modified in the last 24 hours, while excluding certain paths (exceptions list), and then reports the results. [View Folder](/changed-files-cronjob)
 * Check MySQL Health via CLI Script [View Folder](/)
 * update-flatpaks-clean.sh
-    - A Script that Updates only Flatpak apps, ignoring locale/runtime rebuilds, with clean logging and optional daily automation. [View Folder](/)
+    - Is a Script that Updates only Flatpak apps, ignoring locale/runtime rebuilds, with clean logging and optional daily automation. [View Folder](/)
 
 ---
 
