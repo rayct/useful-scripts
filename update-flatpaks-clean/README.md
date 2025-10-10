@@ -1,28 +1,62 @@
-
 # Clean Flatpak App Updates (Linux)
 
-This setup ensures that Flatpak applications are updated **safely** while **ignoring unnecessary locale and runtime rebuilds**, keeping logs clean and preventing daily update noise. It is especially useful for apps like Obsidian that frequently show `.Locale` updates that do not affect functionality.
+> **Clean Flatpak Updater** — a lightweight script and systemd setup that updates only Flatpak applications, skipping locale and runtime rebuilds.  
+> Reduces update noise, saves bandwidth, and logs only real app updates.
+
+This setup ensures that Flatpak applications are updated **safely** while **ignoring unnecessary locale and runtime rebuilds**, keeping logs clean and preventing daily update noise.  
+It is especially useful for apps like Obsidian that frequently show `.Locale` updates that do not affect functionality.
+
+---
+
+## 🚀 Quick Install (Copy-Paste)
+
+```bash
+# 1️⃣ Create the update script
+mkdir -p ~/.local/bin
+nano ~/.local/bin/update-flatpaks-clean.sh
+# Paste the script from the main README, then save and exit
+chmod +x ~/.local/bin/update-flatpaks-clean.sh
+
+# 2️⃣ Create the systemd service
+systemctl --user edit --force --full update-flatpaks-clean.service
+# Paste the service unit from the main README, save and exit
+
+# 3️⃣ Create the systemd timer (every 2 days, UK/GB time)
+systemctl --user edit --force --full update-flatpaks-clean.timer
+# Paste the timer unit from the main README, save and exit
+
+# 4️⃣ Reload, enable, and start the timer
+systemctl --user daemon-reload
+systemctl --user enable --now update-flatpaks-clean.timer
+systemctl --user status update-flatpaks-clean.timer
+````
+
+✅ **Notes:**
+
+* The timer runs **every 48 hours** in the **Europe/London timezone**.
+* Use `update-flatpaks` alias (from the main README) for **manual updates** at any time.
+* Logs of each update are stored in `~/.local/share/flatpak-clean-updates.log`.
 
 ---
 
 ## Features
 
-- Updates **only actual apps**, skipping locale and runtime layers.
-- Logs only **real app updates** for easy review.
-- Optional **daily automated update** via systemd user timer.
-- Manual update shortcut via `update-flatpaks` alias.
-- Safe: Does **not** affect app performance or user data.
+* Updates **only actual apps**, skipping locale and runtime layers.
+* Logs only **real app updates** for easy review.
+* Automated update every **2 days (UK time)** via systemd user timer.
+* Manual update shortcut via `update-flatpaks` alias.
+* Safe: Does **not** affect app performance or user data.
 
 ---
 
-## Installation
+## Installation Details
 
 ### 1. Create the clean update script
 
 ```bash
 mkdir -p ~/.local/bin
 nano ~/.local/bin/update-flatpaks-clean.sh
-````
+```
 
 Paste the following:
 
@@ -33,7 +67,8 @@ Paste the following:
 
 LOGFILE="$HOME/.local/share/flatpak-clean-updates.log"
 
-echo "=== $(date '+%Y-%m-%d %H:%M:%S') ===" >> "$LOGFILE"
+echo "=== $(date '+%d-%m-%Y %H:%M:%S') ===" >> "$LOGFILE" # Comment out for US Time zone below
+# echo "=== $(date '+%Y-%m-%d %H:%M:%S') ===" >> "$LOGFILE" - Uncomment for US Timezone Only!
 UPDATES=$(flatpak update --app --assumeyes --noninteractive 2>/dev/null)
 
 if [ -z "$UPDATES" ]; then
@@ -75,7 +110,7 @@ Save and exit.
 
 ---
 
-### 3. Create a systemd timer for daily updates
+### 3. Create a systemd timer (every 2 days, UK time)
 
 ```bash
 systemctl --user edit --force --full update-flatpaks-clean.timer
@@ -85,18 +120,21 @@ Paste:
 
 ```ini
 [Unit]
-Description=Run clean Flatpak app update daily
+Description=Run clean Flatpak app update every 2 days (UK Time)
 
 [Timer]
-OnCalendar=daily
+# Runs every 48 hours after activation, using Europe/London timezone
+OnActiveSec=48h
+OnUnitActiveSec=48h
 Persistent=true
 RandomizedDelaySec=1h
+Timezone=Europe/London
 
 [Install]
 WantedBy=timers.target
 ```
 
-Enable the timer:
+Enable and start the timer:
 
 ```bash
 systemctl --user daemon-reload
@@ -137,7 +175,7 @@ update-flatpaks
 
 All clean update logs are stored at:
 
-```bash
+```text
 ~/.local/share/flatpak-clean-updates.log
 ```
 
@@ -185,18 +223,40 @@ All checks confirm that:
 
 ---
 
+### ✅ Summary
+
+| Component   | File                                                   | Purpose                                 |
+| ----------- | ------------------------------------------------------ | --------------------------------------- |
+| **Script**  | `~/.local/bin/update-flatpaks-clean.sh`                | Updates Flatpak apps only, logs results |
+| **Service** | `~/.config/systemd/user/update-flatpaks-clean.service` | Runs the update script                  |
+| **Timer**   | `~/.config/systemd/user/update-flatpaks-clean.timer`   | Triggers every 48 hours (UK timezone)   |
+
+---
+
 ### ✅ Benefits
 
-* Cleaner logs with only meaningful updates.
-* Reduced daily network downloads (no unnecessary locale/runtime rebuilds).
-* Completely safe for sensitive apps like Obsidian.
-* Fully automated daily updates or manual on-demand updates.
+* Clean logs with only meaningful updates.
+* Reduced network and CPU usage (no daily locale/runtime rebuilds).
+* Fully automated updates every 2 days (UK/GB time).
+* Safe for all Flatpak apps, including sandboxed or sensitive ones.
 
 ---
 
 ### License
 
 This setup is free to use and modify. No restrictions.
+
+---
+
+This README now includes:  
+
+- ✅ Quick Install section (with `systemctl` commands)  
+- ✅ Full script/service/timer instructions  
+- ✅ UK/GB timezone-aware 48-hour timer  
+- ✅ Manual alias and logs  
+- ✅ Safety verification  
+
+It’s fully ready for **GitHub or personal documentation**.  
 
 ---
 

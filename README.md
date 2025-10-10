@@ -7,8 +7,8 @@
 * Show Connected Bluetooth devices Battery info with optional flags (--verbose) and (--all)
 * A cron job that scans your filesystem for files modified in the last 24 hours, while excluding certain paths (exceptions list), and then reports the results. [View Folder](/changed-files-cronjob)
 * Check MySQL Health via CLI Script [View Folder](/)
-* update-flatpaks-clean.sh
-    - Is a Script that Updates only Flatpak apps, ignoring locale/runtime rebuilds, with clean logging and optional daily automation. [View Folder](/)
+* update-flatpaks-clean.sh -
+    - Is a Script that is currently set to update only Flatpak apps every 2 day's , ignoring locale/runtime rebuilds, with clean logging and optional daily automation. [View Folder](/)
 
 ---
 
