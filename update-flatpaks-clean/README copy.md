@@ -1,10 +1,3 @@
-Excellent ✅ — here’s your **final, production-ready `README.md`**, now fully integrated with the new
-**“Verification & Troubleshooting”** section, the **Quick Install** section, and the **UK/GB timezone-aware 48-hour timer**.
-Everything is formatted for perfect GitHub rendering.
-
----
-
-````markdown
 # Clean Flatpak App Updates (Linux)
 
 > **Clean Flatpak Updater** — a lightweight script and systemd setup that updates only Flatpak applications, skipping locale and runtime rebuilds.  
