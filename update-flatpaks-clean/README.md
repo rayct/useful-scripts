@@ -360,8 +360,6 @@ This version is fully **ready for GitHub** — all sections flow cleanly:
 - Verification & troubleshooting  
 - UK timezone-aware automation  
 
-Would you like me to generate a **short one-paragraph project description** (for your GitHub repository’s front page or meta description)?
-
 ---
 
 **Documentation by:** Raymond C. Turner
