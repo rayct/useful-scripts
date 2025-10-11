@@ -8,7 +8,10 @@
 * A cron job that scans your filesystem for files modified in the last 24 hours, while excluding certain paths (exceptions list), and then reports the results. [View Folder](/changed-files-cronjob)
 * Check MySQL Health via CLI Script [View Folder](/)
 * update-flatpaks-clean.sh -
-    - Is a Script that is currently set to update only Flatpak apps every 2 day's , ignoring locale/runtime rebuilds, with clean logging and optional daily automation. [View Folder](/)
+    Clean Flatpak Updater is a lightweight automation tool for Linux that updates only Flatpak applications, skipping unnecessary locale and runtime rebuilds.
+    It uses a simple systemd timer and service to check for updates every 48 hours (UK timezone), log real app changes, and avoid daily update spam.
+    Safe, efficient, and perfect for users who want quiet, controlled Flatpak maintenance — especially for frequently updated apps like Obsidian. [View Folder](/)
+
 
 ---
 
