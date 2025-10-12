@@ -7,14 +7,11 @@
 * Show Connected Bluetooth devices Battery info with optional flags (--verbose) and (--all)
 * A cron job that scans your filesystem for files modified in the last 24 hours, while excluding certain paths (exceptions list), and then reports the results. [View Folder](/changed-files-cronjob)
 * Check MySQL Health via CLI Script [View Folder](/)
-* update-flatpaks-clean.sh -
-    Clean Flatpak Updater is a lightweight automation tool for Linux that updates only Flatpak applications, skipping unnecessary locale and runtime rebuilds.
-    It uses a simple systemd timer and service to check for updates every 48 hours (UK timezone), log real app changes, and avoid daily update spam.
-    Safe, efficient, and perfect for users who want quiet, controlled Flatpak maintenance — especially for frequently updated apps like Obsidian. [View Folder](/)
-
+* update-flatpaks-clean.sh — A lightweight tool that quietly updates Flatpak apps every 48 hours, skipping unnecessary rebuilds and logging real changes for efficient maintenance. [View Folder](/)
+* A lightweight Bash utility that resets FileZilla’s transfer queue, fixes permissions, and logs each repair automatically. [View Folder](/)
 
 ---
 
-**Documentation by:** Raymond C. TURNER
+_**Documentation maintained by:** Raymond C. TURNER_
 
-**Date:** October 10th, 2025
+_**Date:** October 12th, 2025_
