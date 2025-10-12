@@ -1,11 +1,11 @@
 # FileZilla repair script, now with proper YAML frontmatter for categorization, searchability, and tags.
 
 ---
-title: Fix FileZilla Queue Script
-author: rwxray
-created: 2025-10-11
-updated: 2025-10-11
-tags:
+Title: Fix FileZilla Queue Script
+- author: rwxray
+- created: 2025-10-11
+- updated: 2025-10-11
+- tags:
   - linux
   - filezilla
   - script
