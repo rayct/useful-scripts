@@ -141,5 +141,5 @@ echo "✅ FileZilla queue reset and cleaned successfully!"
 
 ---
 
-*Document maintained by **rwxray** — part of the `Linux Maintenance Scripts` collection.*
+*Document maintained by **Raymond C. Turner** — part of the `Linux Maintenance Scripts` collection.*
 

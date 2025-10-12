@@ -3,48 +3,37 @@
 # fix-filezilla-queue.sh
 # -----------------------
 # Safely reset and clean FileZilla’s transfer queue database.
-# Logs all operations to ~/filezilla-clean/.
+# Intended for Linux systems where FileZilla stores its config under ~/.config/filezilla/
 #
-# Author: Raymond C. Turner
-# Created: 12-10-2025
-# Version: 1.1
+# Author: rwxray
+# Created: 2025-10-11
+# Version: 1.0
 #
 # Usage:
 #   ./fix-filezilla-queue.sh
 #
-# Optional global install:
-#   sudo install -m 755 fix-filezilla-queue.sh /usr/local/bin/fix-filezilla-queue
+# Optional:
+#   Install globally (requires sudo):
+#     sudo install -m 755 fix-filezilla-queue.sh /usr/local/bin/fix-filezilla-queue
 #
 # Then run anytime:
-#   fix-filezilla-queue
+#     fix-filezilla-queue
 #
 
 set -euo pipefail
 
 QUEUE_DIR="$HOME/.config/filezilla"
 QUEUE_FILE="$QUEUE_DIR/queue.sqlite3"
-LOG_DIR="$HOME/filezilla-clean"
-TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-LOG_FILE="$LOG_DIR/fix-filezilla-queue_$TIMESTAMP.log"
 
-# Ensure the log directory exists
-mkdir -p "$LOG_DIR"
-
-# Redirect all output to both console and log file
-exec > >(tee -a "$LOG_FILE") 2>&1
-
-echo "🕒 Log started: $(date)"
 echo "🔧 Checking FileZilla queue at: $QUEUE_FILE"
-echo "🪵 Logging to: $LOG_FILE"
-echo "--------------------------------------------"
 
-# Ensure FileZilla config directory exists
+# Ensure the directory exists
 if [[ ! -d "$QUEUE_DIR" ]]; then
-  echo "📁 Creating FileZilla config directory..."
+  echo "Creating FileZilla config directory..."
   mkdir -p "$QUEUE_DIR"
 fi
 
-# Remove leftover SQLite journals or lock files
+# Remove any leftover SQLite journal or lock files
 echo "🧹 Removing stale SQLite journal files..."
 rm -f "$QUEUE_DIR"/queue.sqlite3-{wal,shm,journal} 2>/dev/null || true
 
@@ -63,6 +52,3 @@ touch "$QUEUE_FILE"
 chmod 600 "$QUEUE_FILE"
 
 echo "✅ FileZilla queue reset and cleaned successfully!"
-echo "🗂️  Log saved to: $LOG_FILE"
-echo "🕓 Completed at: $(date)"
-echo "--------------------------------------------"
