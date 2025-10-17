@@ -1,14 +1,3 @@
-Perfect ✅ — here’s your **final, polished `README.md`**, fully updated and ready for GitHub.
-It includes:
-
-* The clean header and project description
-* Setup steps
-* Verification & Troubleshooting section
-* And the new **Uninstall / Remove Timer** section
-
----
-
-````markdown
 # 🧼 Clean Flatpak App Updates (Linux)
 
 > **Clean Flatpak Updater** — a lightweight script and systemd setup that updates only Flatpak applications, skipping locale and runtime rebuilds.  
@@ -49,6 +38,37 @@ Make it executable:
 ```bash
 chmod +x ~/.local/bin/update-flatpaks-clean.sh
 ```
+
+---
+
+## 🚀 Quick Install (Copy-Paste)
+
+```bash
+# 1️⃣ Create the update script
+mkdir -p ~/.local/bin
+nano ~/.local/bin/update-flatpaks-clean.sh
+# Paste the script from the main README, then save and exit
+chmod +x ~/.local/bin/update-flatpaks-clean.sh
+
+# 2️⃣ Create the systemd service
+systemctl --user edit --force --full update-flatpaks-clean.service
+# Paste the service unit from the main README, save and exit
+
+# 3️⃣ Create the systemd timer (every 2 days, UK/GB time)
+systemctl --user edit --force --full update-flatpaks-clean.timer
+# Paste the timer unit from the main README, save and exit
+
+# 4️⃣ Reload, enable, and start the timer
+systemctl --user daemon-reload
+systemctl --user enable --now update-flatpaks-clean.timer
+systemctl --user status update-flatpaks-clean.timer
+````
+
+✅ **Notes:**
+
+* The timer runs **every 48 hours** in the **Europe/London timezone**.
+* Use `update-flatpaks` alias (from the main README) for **manual updates** at any time.
+* Logs of each update are stored in `~/.local/share/flatpak-clean-updates.log`.
 
 ---
 
@@ -250,9 +270,6 @@ Ideal for users who want quiet, controlled Flatpak maintenance without unnecessa
 
 ---
 
-```
+_**Documentation Maintained by:** Raymond C. Turner_
 
----
-
-Would you like me to add a **short tagline** for the GitHub repo header (under 100 characters, e.g. “Flatpak app updater with clean logs, no locale/runtime noise”)?
-```
+_**Date:** October 17th, 2025_
