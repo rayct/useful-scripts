@@ -362,6 +362,6 @@ This version is fully **ready for GitHub** — all sections flow cleanly:
 
 ---
 
-**Documentation by:** Raymond C. Turner
+_**Documentation Maintained by:** Raymond C. Turner_
 
-**Date:** October 11th, 2025
+_**Date:** October 17th, 2025_
