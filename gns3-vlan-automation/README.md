@@ -66,15 +66,45 @@ requests==2.32.3
 ---
 
 ## 🧰 Environment Setup
+It’s recommended to isolate dependencies using a virtual environment.
 
 You can set up your environment using **either**:
+
+### 🧩 Option 1: Manually Setup
+
+```bash
+python3 -m venv venv
+source venv/bin/activate   # On Linux/macOS
+# or
+venv\Scripts\Activate.ps1  # On Windows PowerShell
+```
+
+2️⃣ Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+This installs:
+
+gns3fy → GNS3 automation and project management
+
+requests → REST API client for server communication
+
+3️⃣ Deactivate When Done
+
+```bash
+deactivate
+```
+
+---
 
 * Automated setup scripts (recommended)
 * A simple `Makefile` workflow (for developers)
 
 ---
 
-### 🧩 Option 1: Setup Scripts
+### 🧩 Option 2: Setup Scripts
 
 #### Linux / macOS
 
@@ -95,6 +125,15 @@ Both scripts:
 * Install from `requirements.txt`
 * Run `verify_gns3_setup.py` if found
 * Leave you ready to execute the automation script
+
+List installed packages
+
+To see what’s running inside the venv:
+
+```bash
+pip list
+```
+---
 
 ### A simple **one-liner command** to check if a virtual environment is active:
 
@@ -144,7 +183,7 @@ If you want, I can also give a **Python version** that works cross-platform. It�
 
 ---
 
-### ⚙️ Option 2: Using Makefile (Linux/macOS Developers)
+### ⚙️ Option 3: Using Makefile (Linux/macOS Developers)
 
 For convenience, you can use the included `Makefile`:
 
