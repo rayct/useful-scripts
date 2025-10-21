@@ -9,9 +9,10 @@
 * Check MySQL Health via CLI Script [View Folder](/)
 * update-flatpaks-clean.sh — A lightweight tool that quietly updates Flatpak apps every 48 hours, skipping unnecessary rebuilds and logging real changes for efficient maintenance. [View Folder](/)
 * A lightweight Bash utility that resets FileZilla’s transfer queue, fixes permissions, and logs each repair automatically. [View Folder](/)
+* VLAN Lab Automation for GNS3, a fully automated Python script that builds, configures, and tests a multi-VLAN lab in **GNS3** using the REST API via [`gns3fy`](https://github.com/davidban77/gns3fy). [View Folder](/)
 
 ---
 
-_**Documentation maintained by:** Raymond C. TURNER_
+_**Documentation Maintained by:** Raymond C. TURNER_
 
 _**Date:** October 21st, 2025_
