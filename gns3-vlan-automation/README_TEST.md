@@ -96,52 +96,6 @@ Both scripts:
 * Run `verify_gns3_setup.py` if found
 * Leave you ready to execute the automation script
 
-### A simple **one-liner command** to check if a virtual environment is active:
-
----
-
-### **Unix / Linux / macOS**
-
-```bash
-[ -z "$VIRTUAL_ENV" ] && echo "No venv active" || echo "Venv active: $VIRTUAL_ENV"
-```
-
-### **Windows (cmd)**
-
-```cmd
-IF "%VIRTUAL_ENV%"=="" (ECHO No venv active) ELSE (ECHO Venv active: %VIRTUAL_ENV%)
-```
-
-### **Windows (PowerShell)**
-
-```powershell
-if (-not $env:VIRTUAL_ENV) { "No venv active" } else { "Venv active: $env:VIRTUAL_ENV" }
-```
----
-
-## **An ultra-compact version under 80 characters for quick interactive checks:**
-
-```python
-import sys,os;print(os.environ.get("VIRTUAL_ENV")or(sys.prefix if sys.prefix!=getattr(sys,"base_prefix",sys.prefix) else "No venv active"))
-```
-
-It does the same detection:
-
-* Checks `VIRTUAL_ENV` first.
-* Then compares `sys.prefix` with `sys.base_prefix`.
-* Prints the venv path if active, otherwise “No venv active.”
-
-Perfect for a quick one-liner in a REPL or script start.
-
-
----
-
-This checks the `VIRTUAL_ENV` environment variable, which is set when a venv is active, and prints a clear status message. ✅
-
-If you want, I can also give a **Python version** that works cross-platform. It’s handy if you’re scripting. Do you want that?
-
-
-
 ---
 
 ### ⚙️ Option 2: Using Makefile (Linux/macOS Developers)
@@ -168,6 +122,8 @@ Example output:
 ---
 
 ## 🧪 Environment Verification (Optional)
+
+If you want to verify manually, create a `verify_gns3_setup.py`:
 
 ```python
 #!/usr/bin/env python3

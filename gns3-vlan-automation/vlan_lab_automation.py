@@ -19,7 +19,7 @@ from gns3fy import Gns3Connector, Project, Node, Link
 # ---------------------------
 # === USER CONFIGURATION ====
 # ---------------------------
-GNS3_SERVER = "http://172.16.132.128:80"   # your GNS3 server
+GNS3_SERVER = "http://172.16.132.128"   # your GNS3 server
 PROJECT_NAME = "VLAN_Lab_Automation"
 
 ROUTER_TEMPLATE = "Cisco 2911"   # change to match your template name
