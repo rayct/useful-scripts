@@ -1,0 +1,53 @@
+# 🐍 Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+*.env
+*.venv
+venv/
+env/
+.env
+.vscode/
+.idea/
+.DS_Store
+
+# 🧱 GNS3
+*.gns3
+*.gns3project
+*.gns3a
+*.gns3topology
+*.gns3_device
+*.net
+*.cfg
+*.backup
+project-files/
+projects/
+logs/
+*.pkt
+
+# 🧪 Local testing
+output/
+tmp/
+test_results/
+results/
+*.txt
+*.xml
+
+# 🔐 Credentials / Tokens
+*.key
+*.pem
+*.crt
+*.json
+*.yaml
+*.yml
+
+# 🧰 System files
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# 🚀 Custom local files
+gns3_server_config.json
+local_settings.json
