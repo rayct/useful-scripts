@@ -11,9 +11,11 @@
 * A lightweight Bash utility that resets FileZilla’s transfer queue, fixes permissions, and logs each repair automatically. [View Folder](/)
 * VLAN Lab Automation for GNS3.
     - A fully automated Python script that builds, configures, and tests a multi-VLAN lab in **GNS3** using the REST API via [`gns3fy`](https://github.com/davidban77/gns3fy). [View Folder](/)
+* Added a robust, user-friendly Linux suspend helper script [View Folder](/)
+    - Designed for laptops and desktops where the “Suspend” option sometimes disappears or becomes inhibited (e.g., Cinnamon, GNOME, KDE).
 
 ---
 
 _**Documentation Maintained by:** Raymond C. TURNER_
 
-_**Date:** October 21st, 2025_
+_**Date:** October 22nd, 2025_
