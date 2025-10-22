@@ -110,7 +110,7 @@ deactivate
 
 ```bash
 chmod +x setup.sh
-./setup.sh
+./setup_helper.sh
 ```
 
 #### Windows (PowerShell)
@@ -336,6 +336,6 @@ run:
 
 _**Documentation Maintained By:** Raymond C. Turner_
 
-_**Date:** October 21st, 2025_
+_**Date:** October 22nd, 2025_
 
 
