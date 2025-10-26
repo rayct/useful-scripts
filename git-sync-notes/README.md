@@ -94,7 +94,7 @@ fi
 
 {
   echo "--------------------------------------------"
-  echo "🕒 Sync started: $(date '+%Y-%m-%d %H:%M:%S')"
+  echo "🕒 Sync started: $(date '+%d-%m-%Y %H:%M:%S')"
   cd "$VAULT_DIR" || { echo "❌ Vault directory not found: $VAULT_DIR"; exit 1; }
 
   echo "🔄 Pulling latest changes..."
@@ -102,7 +102,7 @@ fi
 
   echo "📦 Adding and committing changes..."
   git add .
-  git commit -m "Auto update: $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit."
+  git commit -m "Auto update: $(date '+%d-%m-%Y %H:%M:%S')" || echo "No changes to commit."
 
   echo "🚀 Pushing to GitHub..."
   git push
@@ -172,7 +172,7 @@ chmod +x ~/.local/share/applications/git-sync-notes.desktop
 2. Add:
 
    * **Name:** Git Sync Notes
-   * **Command:** `/home/ray/git-sync-notes.sh`
+   * **Command:** `/home/user/git-sync-notes.sh`
    * **Shortcut:** `Ctrl + Alt + S`
 
 Now press `Ctrl + Alt + S` anytime to instantly sync your notes.
@@ -322,4 +322,4 @@ chmod +x ~/git-sync-notes.sh
 
 _**Documentation Maintained By:** Raymond C. Turner_
 
-_**Date: October 26th, 2025**_
+_**Date: October 27th, 2025**_
