@@ -6,8 +6,6 @@
 
 ---
 
-### 📄 `README.md`
-
 # 🗒️ Obsidian Notes – Secure GitHub Sync via SSH
 
 This repository contains my Obsidian vault (`~/notes`) synchronized securely with GitHub using SSH and a simple automated shell script.  
