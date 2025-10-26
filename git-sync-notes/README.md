@@ -1,11 +1,13 @@
-Complete `README.md` including the **“Clone & Restore on a New Device”** section at the end.
-This version is ideal for keeping in your repo so you can rebuild your Obsidian + Git + SSH setup anywhere securely.
+**Updated and complete `README.md`**, now reflecting the changes to the sync script:
+
+* Logs are saved **inside the vault directory (`notes/git-sync.log`)**
+* Automatically keeps only the **last 100 entries**
+* All other setup details remain consistent
 
 ---
 
 ### 📄 `README.md`
 
-````markdown
 # 🗒️ Obsidian Notes – Secure GitHub Sync via SSH
 
 This repository contains my Obsidian vault (`~/notes`) synchronized securely with GitHub using SSH and a simple automated shell script.  
@@ -20,7 +22,7 @@ This workflow uses:
 - **Git** (for version control)
 - **GitHub** (remote backup)
 - **SSH authentication** (secure, no tokens or passwords)
-- **Auto-sync Bash script** with desktop notifications
+- **Auto-sync Bash script** with desktop notifications and rotating logs
 
 ---
 
@@ -31,6 +33,7 @@ notes/
 ├── .git/                 # Git repo metadata
 ├── .obsidian/            # Obsidian settings
 ├── git-sync-notes.sh     # Auto-sync script
+├── git-sync.log          # Sync log (rotating, last 100 entries)
 └── <your-notes>.md       # Your markdown notes
 ````
 
@@ -75,15 +78,26 @@ File: `~/git-sync-notes.sh`
 ```bash
 #!/bin/bash
 # Auto sync Obsidian notes with GitHub (SSH)
-# Logs all actions to ~/git-sync.log and sends desktop notifications
+# Logs to notes/git-sync.log, keeps last 100 entries, sends desktop notifications
 
-LOGFILE=~/git-sync.log
 VAULT_DIR=~/notes
+LOGFILE="$VAULT_DIR/git-sync.log"
+
+# Ensure the vault directory exists
+if [ ! -d "$VAULT_DIR" ]; then
+  notify-send "❌ Git Sync Failed" "Vault directory not found: $VAULT_DIR"
+  exit 1
+fi
+
+# Rotate logs — keep only last 100 entries
+if [ -f "$LOGFILE" ]; then
+  tail -n 100 "$LOGFILE" > "$LOGFILE.tmp" && mv "$LOGFILE.tmp" "$LOGFILE"
+fi
 
 {
   echo "--------------------------------------------"
   echo "🕒 Sync started: $(date '+%Y-%m-%d %H:%M:%S')"
-  cd "$VAULT_DIR" || { echo "❌ Vault directory not found: $VAULT_DIR"; notify-send "Git Sync Failed" "Vault directory not found."; exit 1; }
+  cd "$VAULT_DIR" || { echo "❌ Vault directory not found: $VAULT_DIR"; exit 1; }
 
   echo "🔄 Pulling latest changes..."
   git pull --rebase
@@ -100,12 +114,14 @@ VAULT_DIR=~/notes
 } >> "$LOGFILE" 2>&1
 
 # Desktop notification
-if grep -q "error" "$LOGFILE"; then
-  notify-send "⚠️ Git Sync Error" "Check ~/git-sync.log for details."
+if grep -qi "error" "$LOGFILE"; then
+  notify-send "⚠️ Git Sync Error" "Check git-sync.log in your notes folder for details."
 else
   notify-send "✅ Git Sync Complete" "Notes synced at $(date '+%H:%M')"
 fi
 ```
+
+---
 
 ### 🧰 Setup
 
@@ -122,8 +138,10 @@ chmod +x ~/git-sync-notes.sh
 ### 📜 Check logs
 
 ```bash
-cat ~/git-sync.log
+cat ~/notes/git-sync.log
 ```
+
+The log file automatically keeps only the **last 100 entries** to prevent it from growing too large.
 
 ---
 
@@ -293,7 +311,7 @@ chmod +x ~/git-sync-notes.sh
 
 ✅ **Secure:** SSH authentication
 ✅ **Automated:** One-click or shortcut sync
-✅ **Logged:** Activity logged to `~/git-sync.log`
+✅ **Logged:** Activity logged to `notes/git-sync.log` (rotating)
 ✅ **Restorable:** Clone + restore anywhere securely
 ✅ **Notified:** Desktop popup on success/failure
 
@@ -301,7 +319,6 @@ chmod +x ~/git-sync-notes.sh
 
 > *“A note not backed up is a note already lost.”* — You, before you used Git 😄
 
-```
 
 ---
 

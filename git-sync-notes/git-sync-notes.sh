@@ -1,14 +1,25 @@
 #!/bin/bash
 # Auto sync Obsidian notes with GitHub (SSH)
-# Logs all actions to ~/git-sync.log and sends desktop notifications
+# Logs to notes/git-sync.log, keeps last 100 entries, sends desktop notifications
 
-LOGFILE=~/git-sync.log
 VAULT_DIR=~/notes
+LOGFILE="$VAULT_DIR/git-sync.log"
+
+# Ensure the vault directory exists
+if [ ! -d "$VAULT_DIR" ]; then
+  notify-send "❌ Git Sync Failed" "Vault directory not found: $VAULT_DIR"
+  exit 1
+fi
+
+# Rotate logs — keep only last 100 entries
+if [ -f "$LOGFILE" ]; then
+  tail -n 100 "$LOGFILE" > "$LOGFILE.tmp" && mv "$LOGFILE.tmp" "$LOGFILE"
+fi
 
 {
   echo "--------------------------------------------"
-  echo "🕒 Sync started: $(date '+%Y-%m-%d %H:%M:%S')"
-  cd "$VAULT_DIR" || { echo "❌ Vault directory not found: $VAULT_DIR"; notify-send "Git Sync Failed" "Vault directory not found."; exit 1; }
+  echo "🕒 Sync started: $(date '+%d-%m-%Y %H:%M:%S')"
+  cd "$VAULT_DIR" || { echo "❌ Vault directory not found: $VAULT_DIR"; exit 1; }
 
   echo "🔄 Pulling latest changes..."
   git pull --rebase
@@ -25,10 +36,9 @@ VAULT_DIR=~/notes
 } >> "$LOGFILE" 2>&1
 
 # Desktop notification
-if grep -q "error" "$LOGFILE"; then
-  notify-send "⚠️ Git Sync Error" "Check ~/git-sync.log for details."
+if grep -qi "error" "$LOGFILE"; then
+  notify-send "⚠️ Git Sync Error" "Check git-sync.log in your notes folder for details."
 else
   notify-send "✅ Git Sync Complete" "Notes synced at $(date '+%H:%M')"
 fi
-
 
