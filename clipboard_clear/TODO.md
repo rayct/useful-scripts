@@ -1,0 +1,159 @@
+Excellent — here’s the **complete setup** combining your clipboard-clear script with a **systemd timer**, which runs periodically (e.g. every 5 minutes) instead of staying alive as a daemon.
+
+This version is **more resource-efficient**, ideal for laptops or systems where you don’t want a constant background process.
+
+---
+
+## 🧩 Clipboard Auto-Clear (Systemd Timer Version)
+
+### 1️⃣ Script — `auto_clear_clipboard.sh`
+
+Save this in your scripts folder (e.g. `~/scripts/auto_clear_clipboard.sh`):
+
+```bash
+#!/usr/bin/env bash
+# auto_clear_clipboard.sh
+# Clears the clipboard, logs its previous contents, and sends a notification.
+# Designed for use with systemd timer. Compatible with Linux/macOS.
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_FILE="$SCRIPT_DIR/clipboard_clear_log.txt"
+export TZ="Europe/London"
+
+log() {
+    local msg="[$(date '+%Y-%m-%d %H:%M:%S %Z')] $1"
+    echo "$msg" | tee -a "$LOG_FILE"
+}
+
+notify_user() {
+    local message="$1"
+    if command -v notify-send &>/dev/null; then
+        notify-send "Clipboard Auto Clear" "$message"
+    elif command -v osascript &>/dev/null; then
+        osascript -e "display notification \"$message\" with title \"Clipboard Auto Clear\""
+    fi
+}
+
+get_clipboard_content() {
+    if command -v pbpaste &>/dev/null; then
+        pbpaste
+    elif command -v xclip &>/dev/null; then
+        xclip -selection clipboard -o 2>/dev/null
+    elif command -v xsel &>/dev/null; then
+        xsel --clipboard --output 2>/dev/null
+    else
+        echo ""
+    fi
+}
+
+clear_clipboard() {
+    local before_clear
+    before_clear="$(get_clipboard_content)"
+    log "Clipboard contents before clearing: ${before_clear:-<empty>}"
+
+    if command -v pbcopy &>/dev/null; then
+        echo -n "" | pbcopy
+    elif command -v xclip &>/dev/null; then
+        echo -n "" | xclip -selection clipboard
+    elif command -v xsel &>/dev/null; then
+        echo -n "" | xsel --clipboard --input
+    fi
+
+    log "Clipboard cleared."
+    notify_user "Clipboard cleared and logged."
+}
+
+clear_clipboard
+```
+
+Make it executable:
+
+```bash
+chmod +x ~/scripts/auto_clear_clipboard.sh
+```
+
+---
+
+### 2️⃣ Service — `~/.config/systemd/user/clipboard-clear.service`
+
+```ini
+[Unit]
+Description=Clear Clipboard Contents
+
+[Service]
+Type=oneshot
+ExecStart=%h/scripts/auto_clear_clipboard.sh
+Environment=DISPLAY=:0
+Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%U/bus
+```
+
+*(Make sure the `ExecStart` path points to your actual script location.)*
+
+---
+
+### 3️⃣ Timer — `~/.config/systemd/user/clipboard-clear.timer`
+
+```ini
+[Unit]
+Description=Run clipboard clear every 5 minutes
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=5min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+You can adjust the schedule:
+
+* `OnUnitActiveSec=10min` → every 10 minutes
+* `OnUnitActiveSec=1h` → every hour
+
+---
+
+### 4️⃣ Enable & Start
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now clipboard-clear.timer
+```
+
+---
+
+### 5️⃣ Check Status
+
+**Timer activity:**
+
+```bash
+systemctl --user list-timers
+```
+
+**Logs:**
+
+```bash
+journalctl --user -u clipboard-clear.service
+```
+
+**Clipboard log file:**
+
+```bash
+cat ~/scripts/clipboard_clear_log.txt
+```
+
+---
+
+### ✅ Summary
+
+| Action                | Command                                                |
+| :-------------------- | :----------------------------------------------------- |
+| Manually clear once   | `~/scripts/auto_clear_clipboard.sh`                    |
+| Enable periodic clear | `systemctl --user enable --now clipboard-clear.timer`  |
+| Check schedule        | `systemctl --user list-timers`                         |
+| Disable timer         | `systemctl --user disable --now clipboard-clear.timer` |
+| Logs                  | `clipboard_clear_log.txt` in script’s folder           |
+
+---
+
+Would you like me to extend this timer setup so that it **only clears the clipboard if it contains text older than N minutes** (i.e., check last modified timestamp before clearing)? That would make it even smarter and less intrusive.
