@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
-# auto_clear_clipboard_daemon.sh
-# Automatically clears clipboard at custom intervals, logs events, and self-manages duplicate daemons.
-# Compatible with Linux/macOS. Uses notify-send and logs clipboard contents before clearing.
+# clipboard_clear.sh
+# Clears the clipboard only if its contents are older than a set threshold.
+# Logs activity and sends desktop notifications.
+# Designed for systemd timer or manual use. Compatible with Linux/macOS.
 
 # --- CONFIGURATION ---
-INTERVAL=${1:-300}  # Default: 300 seconds (5 minutes)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="$SCRIPT_DIR/clipboard_clear_log.txt"
-PID_FILE="$SCRIPT_DIR/clipboard_clear_daemon.pid"
+STATE_FILE="$SCRIPT_DIR/clipboard_last_content.txt"
+THRESHOLD_MINUTES=5      # Minimum age before clearing (in minutes)
 export TZ="Europe/London"
 
 # --- FUNCTIONS ---
@@ -19,9 +20,9 @@ log() {
 notify_user() {
     local message="$1"
     if command -v notify-send &>/dev/null; then
-        notify-send "Clipboard Daemon" "$message"
+        notify-send "Clipboard Auto Clear" "$message"
     elif command -v osascript &>/dev/null; then
-        osascript -e "display notification \"$message\" with title \"Clipboard Daemon\""
+        osascript -e "display notification \"$message\" with title \"Clipboard Auto Clear\""
     fi
 }
 
@@ -37,100 +38,63 @@ get_clipboard_content() {
     fi
 }
 
-clear_clipboard() {
-    local before_clear
-    before_clear="$(get_clipboard_content)"
-    log "Clipboard contents before clearing: ${before_clear:-<empty>}"
-
+set_clipboard_content() {
     if command -v pbcopy &>/dev/null; then
-        echo -n "" | pbcopy
+        echo -n "$1" | pbcopy
     elif command -v xclip &>/dev/null; then
-        echo -n "" | xclip -selection clipboard
+        echo -n "$1" | xclip -selection clipboard
     elif command -v xsel &>/dev/null; then
-        echo -n "" | xsel --clipboard --input
-    fi
-
-    log "Clipboard cleared."
-    notify_user "Clipboard cleared and logged."
-}
-
-stop_existing_daemons() {
-    # Stop previous daemon via PID file if valid
-    if [ -f "$PID_FILE" ]; then
-        OLD_PID=$(cat "$PID_FILE")
-        if kill -0 "$OLD_PID" 2>/dev/null; then
-            log "Stopping existing daemon (PID $OLD_PID)..."
-            kill "$OLD_PID"
-            sleep 1
-        fi
-        rm -f "$PID_FILE"
-    fi
-
-    # Stop any stray background processes matching the script
-    local PIDS
-    PIDS=$(pgrep -f "auto_clear_clipboard_daemon.sh start" || true)
-    if [ -n "$PIDS" ]; then
-        log "Killing old daemon processes: $PIDS"
-        kill $PIDS 2>/dev/null || true
+        echo -n "$1" | xsel --clipboard --input
     fi
 }
 
-start_daemon() {
-    stop_existing_daemons
-    log "Starting new clipboard daemon (interval: ${INTERVAL}s)..."
+clipboard_needs_clearing() {
+    # If state file doesn’t exist, create it and skip clearing
+    if [ ! -f "$STATE_FILE" ]; then
+        get_clipboard_content > "$STATE_FILE"
+        date +%s > "${STATE_FILE}.time"
+        log "State initialized; clipboard clear skipped this cycle."
+        return 1
+    fi
 
-    (
-        echo $$ > "$PID_FILE"
-        while true; do
-            clear_clipboard
-            sleep "$INTERVAL"
-        done
-    ) &
-    log "Daemon started (PID $!). Logs written to $LOG_FILE"
-}
+    local current_content saved_content
+    current_content="$(get_clipboard_content)"
+    saved_content="$(cat "$STATE_FILE")"
 
-stop_daemon() {
-    if [ -f "$PID_FILE" ]; then
-        PID=$(cat "$PID_FILE")
-        if kill -0 "$PID" 2>/dev/null; then
-            kill "$PID"
-            log "Daemon stopped (PID $PID)."
-        else
-            log "PID file found but process not running."
-        fi
-        rm -f "$PID_FILE"
+    # If clipboard changed, update and skip clearing
+    if [[ "$current_content" != "$saved_content" ]]; then
+        log "Clipboard changed since last check; skipping clear."
+        echo "$current_content" > "$STATE_FILE"
+        date +%s > "${STATE_FILE}.time"
+        return 1
+    fi
+
+    # Compare elapsed time since last change
+    local last_time current_time elapsed threshold_seconds
+    last_time=$(cat "${STATE_FILE}.time" 2>/dev/null || echo 0)
+    current_time=$(date +%s)
+    elapsed=$((current_time - last_time))
+    threshold_seconds=$((THRESHOLD_MINUTES * 60))
+
+    if (( elapsed >= threshold_seconds )); then
+        return 0  # true: needs clearing
     else
-        local PIDS
-        PIDS=$(pgrep -f "auto_clear_clipboard_daemon.sh start" || true)
-        if [ -n "$PIDS" ]; then
-            kill $PIDS 2>/dev/null
-            log "Stopped daemon(s): $PIDS"
-        else
-            log "No running daemon found."
-        fi
+        log "Clipboard unchanged but below age threshold (${elapsed}s < ${threshold_seconds}s)."
+        return 1
     fi
 }
 
-status_daemon() {
-    if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
-        log "Daemon running (PID $(cat "$PID_FILE"))"
-    else
-        log "Daemon not running."
+clear_clipboard_if_old() {
+    if clipboard_needs_clearing; then
+        local before_clear
+        before_clear="$(get_clipboard_content)"
+        log "Clearing clipboard. Previous contents: ${before_clear:-<empty>}"
+        set_clipboard_content ""
+        log "Clipboard cleared (unchanged for ${THRESHOLD_MINUTES} minutes)."
+        notify_user "Clipboard cleared after ${THRESHOLD_MINUTES} minutes of inactivity."
     fi
 }
 
 # --- MAIN EXECUTION ---
-case "$1" in
-    start|"")
-        start_daemon
-        ;;
-    stop)
-        stop_daemon
-        ;;
-    status)
-        status_daemon
-        ;;
-    *)
-        echo "Usage: $0 {start|stop|status} [interval_seconds]"
-        ;;
-esac
+clear_clipboard_if_old
+exit 0
