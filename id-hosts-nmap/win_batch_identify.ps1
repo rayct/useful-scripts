@@ -87,4 +87,4 @@ $outCsv = Join-Path $OutDir "summary.csv"
 $results | Export-Csv -Path $outCsv -NoTypeInformation -Encoding UTF8
 Write-Output "Done. Summary: $outCsv"
 Write-Output "Per-host nmap outputs in $OutDir"
-
+exit 0

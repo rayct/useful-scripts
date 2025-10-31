@@ -128,4 +128,6 @@ Write-Host "CSV summary: $csvFile"
 Write-Host "Per-host results: $OutDir\scan_*"
 Write-Host ""
 Write-Host "Note: This is a full-port (-p-) SYN scan with version & OS detection. Expect long runtimes and heavy network traffic."
+exit 0
+
 
