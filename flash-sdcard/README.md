@@ -142,9 +142,16 @@ If you want to run the script from anywhere (without ./), move it to a system-wi
 ### **Option 1** — Global for all users
 
 ```bash
-sudo mv flash-parrot.sh /usr/local/bin/flash-parrot
-sudo chmod 755 /usr/local/bin/flash-parrot
+sudo cp /home/ray/scripts/flash-sd.sh /usr/local/bin/flash-sd
+sudo chmod 755 /usr/local/bin/flash-sd
 ```
+Verify:
+
+```bash
+which flash-sd
+# Output: /usr/local/bin/flash-sd
+```
+
 Now you can run:
 
 ```bash
@@ -154,11 +161,17 @@ flash-parrot
 ### **Option 2** — For your user only
 ```bash
 mkdir -p ~/bin
-mv flash-parrot.sh ~/bin/flash-parrot
-chmod 755 ~/bin/flash-parrot
+cp /home/ray/scripts/flash-sd.sh ~/bin/flash-sd
+chmod 755 ~/bin/flash-sd
+```
+Ensure `~/bin to your PATH` is in your PATH (check with `echo $PATH`).
+
+```bash
+echo 'export PATH=$PATH:~/bin' >> ~/.bashrc
+source ~/.bashrc
 ```
 
-Ensure `~/bin` is in your PATH (check with `echo $PATH`).
+> [!note] Now flash-sd works anywhere for your user only.
 
 Then simply type:
 
