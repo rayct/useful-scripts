@@ -40,8 +40,10 @@ You’ll be prompted for confirmation before the SD card is overwritten.
 ### Option 1 — System-wide (all users)
 
 ```bash
-sudo cp flash-sd_v1.3 /usr/local/bin/flash-sd
+chmod +x flash-sd_v1.3.sh
+sudo cp flash-sd_v1.3.sh /usr/local/bin/flash-sd
 sudo chmod 755 /usr/local/bin/flash-sd
+
 ```
 
 Now you can run it from **any directory**:
