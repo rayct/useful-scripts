@@ -146,10 +146,11 @@ ssh rwxray@labpi.local
 
 * Created by **rwxray**
 * Designed for Raspberry Pi boards and compatible ARM SBCs
+* Inspired by hands-on Parrot ARM deployment testing
 * Compatible with **single-partition and multi-partition Parrot RPi images**
 
 ---
 
 _**Documentation Maintained By:** Raymond C. Turner_
 
-_**Date:** November 1st, 2025_
+_**Date:** November 2nd, 2025_
