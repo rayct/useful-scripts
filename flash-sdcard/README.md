@@ -135,6 +135,48 @@ You’ll be prompted for confirmation before the SD card is overwritten.
 
 ---
 
+🌍 Make the Script Global
+
+If you want to run the script from anywhere (without ./), move it to a system-wide path.
+
+### **Option 1** — Global for all users
+
+```bash
+sudo mv flash-parrot.sh /usr/local/bin/flash-parrot
+sudo chmod 755 /usr/local/bin/flash-parrot
+```
+Now you can run:
+
+```bash
+flash-parrot
+```
+
+### **Option 2** — For your user only
+```bash
+mkdir -p ~/bin
+mv flash-parrot.sh ~/bin/flash-parrot
+chmod 755 ~/bin/flash-parrot
+```
+
+Ensure `~/bin` is in your PATH (check with `echo $PATH`).
+
+Then simply type:
+
+```bash
+flash-parrot
+```
+
+To verify it’s working:
+
+```bash
+which flash-parrot
+```
+
+```bash
+Output should show either /usr/local/bin/flash-parrot or /home/<user>/bin/flash-parrot.
+```
+---
+
 ## 🧠 Notes
 
 * SSH will be enabled on first boot.
