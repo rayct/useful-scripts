@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # ======================================================
 # 🐦 Parrot OS Raspberry Pi SD Card Flashing Script
+# Name: flash-sd
 # Author: rwxray
 # Version: 1.0
 # ======================================================
