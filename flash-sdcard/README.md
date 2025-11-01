@@ -93,9 +93,7 @@ Then run:
 
 ## 📘 2. `README.md`
 
-Here’s your companion documentation file to include with the script.
 
-````markdown
 # 🐦 Parrot OS Raspberry Pi SD Card Flashing Utility
 
 ### Author: `rwxray`
@@ -216,5 +214,8 @@ ssh rwxray@labpi.local
 * Inspired by hands-on Parrot ARM deployment testing
 * For Raspberry Pi boards and compatible ARM SBCs
 
-
 ---
+
+_**Documentation Maintained By:** Raymond C. Turner_
+
+_**Date:** November 1st, 2025_
