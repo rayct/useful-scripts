@@ -12,7 +12,7 @@ set -euo pipefail
 # IMG="Parrot-security-6.4_rpi.img.xz"
 IMG="Parrot-home-6.4_rpi.img.xz"
 DEVICE="/dev/mmcblk0"
-HOSTNAME="eMMA"
+HOSTNAME="eMMa"
 USERNAME="rwxray"
 # ======================================================
 
