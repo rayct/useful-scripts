@@ -129,8 +129,16 @@ ssh rwxray@labpi.local
 
 ## 🧯 Troubleshooting
 
-* **SD Card not detected**: Reinsert card, check logs with `sudo dmesg | tail -20`.
-* **udisksctl power-off**: Replug or reboot to restore SD reader power.
+### SD Card not detected
+
+* Reinsert card
+* Check logs:
+
+  ```bash
+  sudo dmesg | tail -20
+  ```
+* If using `udisksctl power-off`, replug or reboot to restore power.
+
 * **Read-only boot partition**: script v1.3 remounts automatically; SSH may still fail if the underlying image enforces read-only.
 
 ---
