@@ -138,8 +138,10 @@ attempt_playback() {
   if [[ "$PLAYER" == "mpv" ]]; then
     MPV_ARGS=("$VIDEO")
     [[ $disable_hwdec == true ]] && MPV_ARGS=(--hwdec=no "${MPV_ARGS[@]}")
+
     if [[ "$MODE" == "s" ]]; then
-      MPV_ARGS=(--really-quiet --no-terminal --force-window=no "${MPV_ARGS[@]}")
+      # Correct silent/background mode
+      MPV_ARGS=(--no-terminal --really-quiet --vo=null "${MPV_ARGS[@]}")
       log "Running in SILENT mode." "$CYAN"
       nohup mpv "${MPV_ARGS[@]}" >/dev/null 2>&1 &
       return 0
@@ -151,8 +153,8 @@ attempt_playback() {
 
   elif [[ "$PLAYER" == "celluloid" ]]; then
     if [[ "$MODE" == "s" ]]; then
-      log "Running in SILENT mode." "$CYAN"
-      nohup celluloid --no-video "$VIDEO" >/dev/null 2>&1 &
+      log "⚠️ Silent mode is not fully supported with Celluloid. Playing normally instead." "$YELLOW"
+      celluloid "$VIDEO" >/dev/null 2>&1 &
       return 0
     else
       log "Running in NORMAL (visible) mode." "$CYAN"
