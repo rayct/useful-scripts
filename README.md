@@ -18,19 +18,6 @@ A collection of lightweight scripts to automate tasks, monitor systems, and mana
 | **safe-suspend.sh**              | Robust Linux suspend helper that restores the suspend option on laptops/desktops where it may disappear (Cinnamon, GNOME, KDE). [View Folder](/)                                                  |
 | **checkproc**                    | Verify running process integrity by PID on **Linux/macOS/Windows**. Lightweight utility for monitoring and validating processes. [View Folder](/)                                                 |
 
----
-
-This table:
-
-* Makes the README **more readable and organized**.
-* Keeps descriptions concise.
-* Clearly separates the **script name** and **purpose**.
-* Maintains links to folders for easy access.
-
-If you want, I can also add **icons or badges** for each script type (Bash, Python, Cron, etc.) to make it visually nicer and easier to identify at a glance.
-
-Do you want me to do that next?
-
 
 ---
 
