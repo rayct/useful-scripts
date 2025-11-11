@@ -159,8 +159,10 @@ You are free to use, modify, and redistribute this script. Attribution appreciat
 * Configurable thresholds for reboot prompt.
 * Integration with system tray applets or power menus.
 
+
 ---
+
 
 _**Documentation Maintained By:** Raymond C. Turner_
 
-_**Date:** October 22nd, 2025_
+_**Date:** November 11th, 2025_
