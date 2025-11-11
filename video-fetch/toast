@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+VIDEO="$HOMEhome/home/ray/Videos/StephenToast/toast.mp4"
+CONFIG="$HOME/.toast_mode"  # File to store last choice
+
+if [ ! -f "$VIDEO" ]; then
+  echo "Error: video not found at $VIDEO"
+  exit 1
+fi
+
+# Determine player
+if command -v mpv >/dev/null 2>&1; then
+  PLAYER="mpv"
+elif command -v vlc >/dev/null 2>&1; then
+  PLAYER="vlc"
+else
+  echo "Error: install mpv or vlc"
+  exit 1
+fi
+
+# Determine playback mode
+MODE=""
+while [ -z "$MODE" ]; do
+  if [ -f "$CONFIG" ]; then
+    LAST_MODE=$(cat "$CONFIG")
+    echo "Select playback mode:"
+    echo "1) Last playback ($LAST_MODE)"
+    echo "2) Normal (visible)"
+    echo "3) Silent (background)"
+    read -p "Enter choice [1/2/3]: " CHOICE
+
+    case "$CHOICE" in
+      1) MODE="$LAST_MODE" ;;
+      2) MODE="n" ;;
+      3) MODE="s" ;;
+      *) echo "Invalid choice. Please enter 1, 2, or 3." ;;
+    esac
+  else
+    read -p "Play normally (visible) or silent (background)? [n/s]: " USER_MODE
+    if [[ "$USER_MODE" == "n" || "$USER_MODE" == "s" ]]; then
+      MODE="$USER_MODE"
+    else
+      echo "Invalid input. Please enter 'n' or 's'."
+    fi
+  fi
+done
+
+# Save chosen mode
+echo "$MODE" > "$CONFIG"
+
+# Play video based on mode
+if [[ "$MODE" == "s" ]]; then
+  if [[ "$PLAYER" == "mpv" ]]; then
+    mpv --really-quiet --no-terminal --force-window=no --idle=no "$VIDEO" &
+  else
+    cvlc --play-and-exit --no-video "$VIDEO" >/dev/null 2>&1 &
+  fi
+else
+  if [[ "$PLAYER" == "mpv" ]]; then
+    mpv --really-quiet --no-terminal --force-window=no --idle=no "$VIDEO"
+  else
+    cvlc --play-and-exit "$VIDEO"
+  fi
+fi
