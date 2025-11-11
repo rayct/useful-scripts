@@ -1,167 +1,78 @@
-# video-fetch (Linux-Friendly)
-
-`video-fetch` lets you play a local video with **one command**. You can name the script anything (e.g., `Toast`, `MovieNight`) and choose between **last playback**, **normal**, or **silent/background** modes. On Linux, it prefers **mpv** for reliability and uses VLC as a fallback.
+Here’s a clean, concise README section for your updated `toast-debug` script:
 
 ---
+
+# toast-debug
+
+**toast-debug** is a robust, diagnostic video playback script for Linux. It automatically detects your available player (`mpv` or `Celluloid`) and provides normal or silent playback with hardware/software decoding fallback. It logs all actions to a file for easy debugging.
 
 ## Features
 
-* Plays a designated local video file.
-* Auto-closes the player when finished.
-* Works with `mpv` (preferred) or VLC (`vlc`/`cvlc`) in Linux.
-* Prompts for playback mode: last, normal, or silent.
-* Strict input validation.
-* Supports multiple scripts for different videos.
-
----
+* Automatic detection of `mpv` or `Celluloid`
+* Normal (visible) and silent (background) playback modes
+* Hardware/software decoding fallback (mpv only)
+* Debug mode (`--debug`) for verbose output
+* Custom logfile support (`--logfile <path>`)
+* Persistent last playback mode selection
 
 ## Installation
 
-1. **Create the script** in `~/bin`:
+1. Ensure your video is in the default location (or adjust `VIDEO` in the script):
 
-```bash
-nano ~/bin/Toast
-```
+   ```text
+   ~/Videos/StephenToast/toast.mp4
+   ```
+2. Make the script executable:
 
-Paste the Linux-friendly template:
+   ```bash
+   chmod +x toast-debug
+   ```
+3. Optionally, place it in a folder in your PATH:
 
-```bash
-#!/usr/bin/env bash
-VIDEO="$HOME/Videos/favorite.mp4"
-CONFIG="$HOME/.toast_mode"
-
-if [ ! -f "$VIDEO" ]; then
-  echo "Error: video not found at $VIDEO"
-  exit 1
-fi
-
-# Determine player (prefer mpv)
-if command -v mpv >/dev/null 2>&1; then
-  PLAYER="mpv"
-elif command -v vlc >/dev/null 2>&1; then
-  PLAYER="vlc"
-else
-  echo "Error: install mpv or vlc"
-  exit 1
-fi
-
-# Prompt user for playback mode
-MODE=""
-while [ -z "$MODE" ]; do
-  if [ -f "$CONFIG" ]; then
-    LAST_MODE=$(cat "$CONFIG")
-    echo "Select playback mode:"
-    echo "1) Last playback ($LAST_MODE)"
-    echo "2) Normal (visible)"
-    echo "3) Silent (background)"
-    read -p "Enter choice [1/2/3]: " CHOICE
-    case "$CHOICE" in
-      1) MODE="$LAST_MODE" ;;
-      2) MODE="n" ;;
-      3) MODE="s" ;;
-      *) echo "Invalid choice. Please enter 1, 2, or 3." ;;
-    esac
-  else
-    read -p "Play normally (visible) or silent (background)? [n/s]: " USER_MODE
-    if [[ "$USER_MODE" == "n" || "$USER_MODE" == "s" ]]; then
-      MODE="$USER_MODE"
-    else
-      echo "Invalid input. Please enter 'n' or 's'."
-    fi
-  fi
-done
-
-# Save chosen mode
-echo "$MODE" > "$CONFIG"
-
-# Play video based on mode
-if [[ "$MODE" == "s" ]]; then
-  if [[ "$PLAYER" == "mpv" ]]; then
-    mpv --really-quiet --no-terminal --force-window=no --idle=no "$VIDEO" &
-  else
-    cvlc --play-and-exit --no-video "$VIDEO" >/dev/null 2>&1 &
-  fi
-else
-  if [[ "$PLAYER" == "mpv" ]]; then
-    mpv "$VIDEO"
-  else
-    vlc --play-and-exit "$VIDEO"
-  fi
-fi
-```
-
-2. Make it executable:
-
-```bash
-chmod +x ~/bin/Toast
-```
-
-3. Ensure `~/bin` is in your PATH:
-
-```bash
-export PATH="$HOME/bin:$PATH"
-```
-
-Add this line to `~/.bashrc` or `~/.zshrc` for persistence.
-
----
+   ```bash
+   sudo mv toast-debug /usr/local/bin/
+   ```
 
 ## Usage
 
-```bash
-Toast
-```
-
-* Choose playback mode:
-
-  1. Last playback
-  2. Normal (visible)
-  3. Silent (background)
-
-* Choice is saved for next run.
-
----
-
-## Multiple Video Scripts
-
-You can create multiple scripts for different videos:
+Run the script interactively:
 
 ```bash
-nano ~/bin/MovieNight
-nano ~/bin/PartyTime
-chmod +x ~/bin/MovieNight ~/bin/PartyTime
+toast-debug
 ```
 
-Run each:
+Options:
+
+* `--debug` or `-d` – Enable verbose debug mode
+* `--logfile <path>` or `-l <path>` – Specify a custom log file location
+
+Example:
 
 ```bash
-Toast
-MovieNight
-PartyTime
+toast-debug --debug --logfile ~/toast-debug.log
 ```
 
----
+The script will prompt for:
 
-## Tips
+1. Playback mode: Last playback, Normal, or Silent
+2. Confirmation to run in debug mode or not (if specified via CLI)
 
-* **Silent/background playback:**
+Logs are saved by default to:
 
-  * mpv: `mpv --really-quiet --no-terminal --force-window=no "$VIDEO" &`
-  * VLC: `cvlc --play-and-exit --no-video "$VIDEO" >/dev/null 2>&1 &`
+```text
+~/.local/share/video-fetch/video-fetch-debug.log
+```
 
-* **Keyboard shortcuts:**
-
-  * mpv: Space=Pause, ←/→=Seek, ↑/↓=Seek by 1 min, m=Mute, q=Quit
-  * VLC GUI: Space=Pause, ←/→=Seek 10 sec, ↑/↓=Volume, m=Mute, q/Esc=Quit
+and rotated automatically, keeping up to 5 previous logs.
 
 ---
 
 ## Notes
 
-* Works with local video files only.
-* Auto-closes the player when finished.
-* Prompts for last/normal/silent mode with strict validation.
-* Prefers mpv on Linux for reliable playback.
+* **Preferred player:** `mpv` — full CLI support and hardware/software fallback
+* **Fallback player:** `Celluloid` — GUI wrapper, no automatic decoding fallback
+* **Silent mode** runs in the background without showing a window
+* Works on Linux Mint and other Debian/Ubuntu-based distributions
 
 ---
 
