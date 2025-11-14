@@ -1,0 +1,187 @@
+#!/usr/bin/env bash
+#
+# toast-debug — Robust video playback
+# Auto-detects mpv or Celluloid and supports normal/silent playback
+# Features:
+# - Hardware/software decoding fallback
+# - Debug mode (--debug)
+# - Custom log file (--logfile <path>)
+# - Logs which decoding mode succeeded
+#
+
+VIDEO="$HOME/Videos/StephenToast/toast.mp4"
+CONFIG="$HOME/.toast_mode"
+DEFAULT_LOG_DIR="$HOME/.local/share/video-fetch"
+LOG_DIR="$DEFAULT_LOG_DIR"
+LOGFILE="$LOG_DIR/video-fetch-debug.log"
+MAX_LOGS=5
+
+# --- ANSI Colors ---
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+RESET='\033[0m'
+
+# --- CLI Flags ---
+DEBUG=false
+CUSTOM_LOG=false
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --debug|-d)
+      DEBUG=true
+      ;;
+    --logfile|-l)
+      shift
+      if [[ -n "$1" ]]; then
+        LOGFILE="$1"
+        CUSTOM_LOG=true
+      else
+        echo -e "${RED}Error:${RESET} --logfile flag requires a path argument."
+        exit 1
+      fi
+      ;;
+    *)
+      echo -e "${YELLOW}Warning:${RESET} Unknown option '$1' ignored."
+      ;;
+  esac
+  shift
+done
+
+# --- Logging Functions ---
+log() {
+  local MSG="$1"
+  local COLOR="${2:-$CYAN}"
+  echo -e "${COLOR}[$(date '+%m-%d-%Y %H:%M:%S')]${RESET} $MSG"
+  echo "[$(date '+%m-%d-%Y %H:%M:%S')] $MSG" >> "$LOGFILE"
+}
+
+error_exit() {
+  log "❌ ERROR: $1" "$RED"
+  echo -e "\n${RED}⚠️  Log file saved to:${RESET} $LOGFILE"
+  exit 1
+}
+
+rotate_logs() {
+  if [ -f "$LOGFILE" ]; then
+    for ((i=MAX_LOGS-1; i>=1; i--)); do
+      if [ -f "${LOGFILE}.${i}" ]; then
+        mv "${LOGFILE}.${i}" "${LOGFILE}.$((i+1))"
+      fi
+    done
+    mv "$LOGFILE" "${LOGFILE}.1"
+  fi
+}
+
+# --- Setup Log Directory ---
+if ! $CUSTOM_LOG; then
+  mkdir -p "$LOG_DIR" || { echo "❌ Failed to create log directory: $LOG_DIR"; exit 1; }
+else
+  mkdir -p "$(dirname "$LOGFILE")" 2>/dev/null
+fi
+rotate_logs
+
+# --- Debug Mode ---
+if $DEBUG; then
+  set -x
+  log "🧩 Debug mode enabled." "$YELLOW"
+fi
+
+log "▶ Starting toast-debug" "$GREEN"
+
+# --- Check Video Exists ---
+log "Checking if video exists at: $VIDEO"
+[[ -f "$VIDEO" ]] || error_exit "Video not found at $VIDEO"
+
+# --- Detect Player ---
+if command -v mpv >/dev/null 2>&1; then
+  PLAYER="mpv"
+elif command -v celluloid >/dev/null 2>&1; then
+  PLAYER="celluloid"
+else
+  error_exit "No supported player found (mpv or Celluloid)."
+fi
+log "Detected player: $PLAYER" "$GREEN"
+
+# --- Playback Mode Selection ---
+MODE=""
+if [ -f "$CONFIG" ]; then
+  LAST_MODE=$(cat "$CONFIG")
+  echo -e "${YELLOW}Select playback mode:${RESET}"
+  echo "1) Last playback ($LAST_MODE)"
+  echo "2) Normal (visible)"
+  echo "3) Silent (background)"
+  read -p "Enter choice [1/2/3]: " CHOICE
+  case "$CHOICE" in
+    1) MODE="$LAST_MODE" ;;
+    2) MODE="n" ;;
+    3) MODE="s" ;;
+    *) echo -e "${RED}Invalid choice, defaulting to Normal mode.${RESET}"; MODE="n" ;;
+  esac
+else
+  read -p "Play normally (visible) or silent (background)? [n/s]: " USER_MODE
+  if [[ "$USER_MODE" =~ ^[ns]$ ]]; then
+    MODE="$USER_MODE"
+  else
+    echo -e "${RED}Invalid input, defaulting to Normal mode.${RESET}"
+    MODE="n"
+  fi
+fi
+echo "$MODE" > "$CONFIG"
+log "Selected playback mode: $MODE" "$CYAN"
+
+# --- Playback Helper Function ---
+attempt_playback() {
+  local disable_hwdec="$1"
+
+  if [[ "$PLAYER" == "mpv" ]]; then
+    MPV_ARGS=("$VIDEO")
+    [[ $disable_hwdec == true ]] && MPV_ARGS=(--hwdec=no "${MPV_ARGS[@]}")
+
+    if [[ "$MODE" == "s" ]]; then
+      # Correct silent/background mode
+      MPV_ARGS=(--no-terminal --really-quiet --vo=null "${MPV_ARGS[@]}")
+      log "Running in SILENT mode." "$CYAN"
+      nohup mpv "${MPV_ARGS[@]}" >/dev/null 2>&1 &
+      return 0
+    else
+      log "Running in NORMAL (visible) mode." "$CYAN"
+      mpv "${MPV_ARGS[@]}" 2>&1 | tee -a "$LOGFILE"
+      return ${PIPESTATUS[0]}
+    fi
+
+  elif [[ "$PLAYER" == "celluloid" ]]; then
+    if [[ "$MODE" == "s" ]]; then
+      log "⚠️ Silent mode is not fully supported with Celluloid. Playing normally instead." "$YELLOW"
+      celluloid "$VIDEO" >/dev/null 2>&1 &
+      return 0
+    else
+      log "Running in NORMAL (visible) mode." "$CYAN"
+      celluloid "$VIDEO" 2>&1 | tee -a "$LOGFILE"
+      return ${PIPESTATUS[0]}
+    fi
+  fi
+}
+
+# --- Attempt Playback with HW then SW fallback ---
+attempt_playback false
+EXIT_CODE=$?
+FINAL_MODE="hardware"
+
+if [[ $EXIT_CODE -ne 0 ]] && [[ "$PLAYER" == "mpv" ]]; then
+  log "⚠️  First playback attempt failed (code $EXIT_CODE). Retrying with software decoding..." "$YELLOW"
+  attempt_playback true
+  EXIT_CODE=$?
+  FINAL_MODE="software"
+fi
+
+if [[ $EXIT_CODE -ne 0 ]]; then
+  error_exit "Playback failed or terminated unexpectedly after retry."
+else
+  log "✅ Playback finished successfully using $FINAL_MODE decoding." "$GREEN"
+fi
+
+echo -e "\n${YELLOW}📁 Log file saved to:${RESET} $LOGFILE"
+[[ "$DEBUG" == true ]] && set +x
+exit 0

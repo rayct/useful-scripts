@@ -50,7 +50,7 @@ sudo apt install libnotify-bin zenity
    echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
    source ~/.bashrc
    ```
-
+   
 3. Test it:
 
    ```bash
@@ -165,4 +165,4 @@ You are free to use, modify, and redistribute this script. Attribution appreciat
 
 _**Documentation Maintained By:** Raymond C. Turner_
 
-_**Date:** November 11th, 2025_
+_**Date:** November 14th, 2025_
